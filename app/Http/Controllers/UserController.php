@@ -33,6 +33,7 @@ class UserController extends Controller
             JWTAuth::factory()->setTTL(1440); /// life time in minutes
 
         try {
+            // vérifier les credentiels et créer le token
             if (!$token = JWTAuth::attempt($credentials)) {
                 return response()->json(['status' => 'CredErr'], 200, ['Content-Type' => 'application/json']);
             }
@@ -40,9 +41,19 @@ class UserController extends Controller
             return response()->json(['status' => 'TokErr'], 200, ['Content-Type' => 'application/json']);
         }
 
-        $CheckActiveUser = DB::table('users')->where('email', $request->json()->get('email'))->value('Activated');
+        $CheckUser = DB::table('users')
+            ->select('Activated', 'UserType')
+            ->where('email', $credentials["email"])
+            ->get();
 
-        if ($CheckActiveUser . "" == "0")
+        /// si l'utilisateur se connecte d'une interface differente
+        if ($request->json()->get('type') . "" != $CheckUser[0]->UserType . "")
+            return response()->json(['status' => 'CredErr'], 200, ['Content-Type' => 'application/json']);
+
+        //table('users')->where('email', $request->json()->get('email'))->value('Activated');
+
+        ///// si le compe est desactivé
+        if ($CheckUser[0]->Activated . "" == "0")
             return response()->json(['status' => 'disactivated'], 200, ['Content-Type' => 'application/json']);
 
         return response()->json(['status' => 'Success', 'token' => $token, 'LogDate' => '' . date('Y-d-m H:i:s')], 200, ['Content-Type' => 'application/json']);

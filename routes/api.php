@@ -29,7 +29,7 @@ Route::post('register', 'UserController@register');
 
 
 //// Login méthode qui va etre utilisée pour tous les membres admins+profs+etuds
-Route::middleware('Cors')->post('login', 'UserController@Login');
+Route::post('login', 'UserController@Login');
 
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return "$request->user();";
