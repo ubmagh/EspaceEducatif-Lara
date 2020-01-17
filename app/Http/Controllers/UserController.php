@@ -26,7 +26,7 @@ class UserController extends Controller
 
     public function Login(Request $request)
     {
-        $credentials = ["email" => $request->json()->get('email'), "password" => $request->json()->get('password')];
+        $credentials = ["email" => $request->json()->get('email'), "password" => $request->json()->get('password'), 'UserType' => $request->json()->get('type')];
         if ($request->json()->get('save'))
             JWTAuth::factory()->setTTL(4320);
         else
@@ -41,19 +41,16 @@ class UserController extends Controller
             return response()->json(['status' => 'TokErr'], 200, ['Content-Type' => 'application/json']);
         }
 
+        /*
         $CheckUser = DB::table('users')
             ->select('Activated', 'UserType')
             ->where('email', $credentials["email"])
             ->get();
-
-        /// si l'utilisateur se connecte d'une interface differente
-        if ($request->json()->get('type') . "" != $CheckUser[0]->UserType . "")
-            return response()->json(['status' => 'CredErr'], 200, ['Content-Type' => 'application/json']);
-
-        //table('users')->where('email', $request->json()->get('email'))->value('Activated');
+*/
+        $CheckUser = DB::table('users')->where('email', $request->json()->get('email'))->value('Activated');
 
         ///// si le compe est desactivé
-        if ($CheckUser[0]->Activated . "" == "0")
+        if ($CheckUser . "" == "0")
             return response()->json(['status' => 'disactivated'], 200, ['Content-Type' => 'application/json']);
 
         return response()->json(['status' => 'Success', 'token' => $token, 'LogDate' => '' . date('Y-d-m H:i:s')], 200, ['Content-Type' => 'application/json']);
