@@ -31,8 +31,12 @@ Route::post('register', 'UserController@register');
 //// Login méthode qui va etre utilisée pour tous les membres admins+profs+etuds
 Route::post('login', 'UserController@Login');
 
+///// retourne les infos primaires et vérifi le token d'un utilisateur
+
+Route::get('TokenVerification', 'UserController@getAuthenticatedUser');
+
+
+
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return "$request->user();";
 });
-
-Route::get('profile', 'UserController@getAuthenticatedUser');
