@@ -133,6 +133,13 @@ class UserController extends Controller
 
         DB::update("update users set LastLogin = '" . $datee["LastLogDate"] . "' where id = ? ", [$user->id]);
 
-        return response()->json(['error' => 'none', 'user' => $user, 'LastLogDate' => '' . date('Y-d-m H:i:s')]);
+        if ($user->UserType . "" == "etud") {
+            $details = DB::table('etudiants')
+                ->select('Fname', 'Lname', 'Filiere', 'Annee')
+                ->where('email', $user->email)
+                ->get();
+        }
+
+        return response()->json(['error' => 'none', 'user' => $user, "details" => $details[0], 'LastLogDate' => '' . date('Y-d-m H:i:s')]);
     }
 }
