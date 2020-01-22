@@ -22,7 +22,7 @@ class CreateEtudiantsTable extends Migration
             $table->string('Sex', 5);
             $table->string('Annee', 5);
             $table->string('CIN', 12);
-
+            $table->string('AvatarPath');
 
 
             $table->foreign('email')->references('email')->on('users');

@@ -93,6 +93,11 @@ class UserController extends Controller
             return response()->json(['status' => 'DBError', 'content' => $exc . ""], 400, ['Content-Type' => 'application/json']);
         }
 
+        if ($request->json()->get('Sex') . "" == "M")
+            $AvatarPath = "DefM.png";
+        else
+            $AvatarPath = "DefF.png";
+
         try {
             $etud = Etudiant::create([
                 'Fname' => trim(strip_tags($request->json()->get('Fname'))),
@@ -102,6 +107,7 @@ class UserController extends Controller
                 'Sex' => trim(strip_tags($request->json()->get('Sex'))),
                 'Annee' => trim(strip_tags($request->json()->get('Annee'))),
                 'CIN' => trim(strip_tags($request->json()->get('CIN'))),
+                'AvatarPath' => $AvatarPath,
             ]);
         } catch (Exception $exc) {
             if ($FstInsert)
@@ -109,10 +115,13 @@ class UserController extends Controller
             return response()->json(['status' => 'DBError', 'content' => $exc . ""], 400, ['Content-Type' => 'application/json']);
         }
 
+        //make default avatar for user
 
-        //$token = JWTAuth::fromUser($user);
+        if ($request->json()->get('Sex') . "" == "M")
 
-        return response()->json(['status' => 'ToValidate', 'content' => 'Wait For Account Validation !'], 201, ['Content-Type' => 'application/json']);
+            //$token = JWTAuth::fromUser($user);
+
+            return response()->json(['status' => 'ToValidate', 'content' => 'Wait For Account Validation !'], 201, ['Content-Type' => 'application/json']);
     }
 
 
@@ -135,9 +144,13 @@ class UserController extends Controller
 
         if ($user->UserType . "" == "etud") {
             $details = DB::table('etudiants')
-                ->select('Fname', 'Lname', 'Filiere', 'Annee')
+                ->select('Fname', 'Lname', 'Filiere', 'Annee', 'AvatarPath')
                 ->where('email', $user->email)
                 ->get();
+
+
+            //// get full avatar url
+            $details[0]->AvatarPath = "http://localhost:8000/images/Avatars/" . $details[0]->AvatarPath;
         }
 
         return response()->json(['error' => 'none', 'user' => $user, "details" => $details[0], 'LastLogDate' => '' . date('Y-d-m H:i:s')]);
