@@ -37,6 +37,16 @@ Route::get('TokenVerification', 'UserController@getAuthenticatedUser');
 
 
 
-Route::middleware('auth:api')->get('/user', function (Request $request) {
-    return "$request->user();";
+/////Classe Routes
+Route::prefix('classes')->group(function () {
+    Route::get('GetInitialClasses', 'UserController@GetInitialClasses'); ///
+});
+
+
+///// End Classe Routes
+
+
+
+Route::middleware('api')->get('user', function (Request $request) {
+    return $request->user();
 });

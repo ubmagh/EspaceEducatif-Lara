@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\User;
 use App\Etudiant;
+use App\professeur;
 use Exception;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
@@ -147,12 +148,49 @@ class UserController extends Controller
                 ->select('Fname', 'Lname', 'Filiere', 'Annee', 'AvatarPath')
                 ->where('email', $user->email)
                 ->get();
-
-
-            //// get full avatar url
-            $details[0]->AvatarPath = "http://localhost:8000/images/Avatars/" . $details[0]->AvatarPath;
+        } else {
+            $details = DB::table('professeurs')
+                ->select('Fname', 'Lname', 'Filiere', 'Matiere', 'AvatarPath')
+                ->where('email', $user->email)
+                ->get();
         }
 
-        return response()->json(['error' => 'none', 'user' => $user, "details" => $details[0], 'LastLogDate' => '' . date('Y-d-m H:i:s')]);
+        //// get full avatar url
+        $details[0]->AvatarPath = "http://localhost:8000/images/Avatars/" . $details[0]->AvatarPath;
+
+        return response()->json(['error' => 'none', 'user' => ['id' => $user->id, 'email' => $user->email, 'LastLogin' => $user->LastLogin, 'UserType' => $user->UserType], "details" => $details[0], 'LastLogDate' => '' . date('Y-d-m H:i:s')]);
+    }
+
+
+    public function GetInitialClasses(Request $request)
+    {
+
+        try {
+            if (!$user = JWTAuth::parseToken()->authenticate()) {
+                return response()->json(['error' => 'userNotFound'], 404);
+            }
+        } catch (TokenExpiredException $e) {
+            return response()->json(["error" => 'token_expired']);
+        } catch (TokenInvalidException $e) {
+            return response()->json(["error" => 'token_invalid']);
+        } catch (JWTException $e) {
+            return response()->json(["error" => 'token_absent']);
+        }
+
+
+        if ($user->UserType . "" == "etud") {
+            $etud = Etudiant::where('email', $user->email)->get();
+            if (empty($etud[0])) {
+                return response()->json(["error" => 'NotStudent']);
+            }
+            $ret =  app('App\Http\Controllers\ClasseController')->GetInitialClassesStud($etud[0]->Filiere . '', $etud[0]->Annee . '');
+        } else {
+            $prof = professeur::where('email', $user->email)->get();
+            if (empty($prof[0])) {
+                return response()->json(["error" => 'NotProf']);
+            }
+            $ret =  app('App\Http\Controllers\ClasseController')->GetInitialClassesProf($prof[0]->id);
+        }
+        return $ret;
     }
 }
