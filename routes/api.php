@@ -39,7 +39,8 @@ Route::get('TokenVerification', 'UserController@getAuthenticatedUser');
 
 /////Classe Routes
 Route::prefix('classes')->group(function () {
-    Route::get('GetInitialClasses', 'UserController@GetInitialClasses'); ///
+    Route::get('GetInitialClasses', 'UserController@GetInitialClasses'); /// initial classe list just 5 classes randomly
+    Route::get('GetClassesList', 'UserController@GetClassesList'); /// Get all classes list
 });
 
 

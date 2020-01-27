@@ -193,4 +193,37 @@ class UserController extends Controller
         }
         return $ret;
     }
+
+
+    public function GetClassesList(Request $request)
+    {
+
+        try {
+            if (!$user = JWTAuth::parseToken()->authenticate()) {
+                return response()->json(['error' => 'userNotFound'], 404);
+            }
+        } catch (TokenExpiredException $e) {
+            return response()->json(["error" => 'token_expired']);
+        } catch (TokenInvalidException $e) {
+            return response()->json(["error" => 'token_invalid']);
+        } catch (JWTException $e) {
+            return response()->json(["error" => 'token_absent']);
+        }
+
+
+        if ($user->UserType . "" == "etud") {
+            $etud = Etudiant::where('email', $user->email)->get();
+            if (empty($etud[0])) {
+                return response()->json(["error" => 'NotStudent']);
+            }
+            $ret =  app('App\Http\Controllers\ClasseController')->GetInitialClassesStud($etud[0]->Filiere . '', $etud[0]->Annee . '');
+        } else {
+            $prof = professeur::where('email', $user->email)->get();
+            if (empty($prof[0])) {
+                return response()->json(["error" => 'NotProf']);
+            }
+            $ret =  app('App\Http\Controllers\ClasseController')->GetClassesList_Prof($prof[0]->id);
+        }
+        return $ret;
+    }
 }

@@ -20,4 +20,10 @@ class ClasseController extends Controller
         $data = classe::where('ProfID', $ProfId)->limit(5)->inRandomOrder()->get();
         return $data;
     }
+
+    public function GetClassesList_Prof(string $ProfId)
+    {
+        $data = classe::where('ProfID', $ProfId)->OrderBy('ClasseName')->get();
+        return $data;
+    }
 }
