@@ -23,7 +23,7 @@ class ClasseController extends Controller
 
     public function GetClassesList_Prof(string $ProfId)
     {
-        $data = classe::where('ProfID', $ProfId)->OrderBy('ClasseName')->get();
+        $data = classe::where('ProfID', $ProfId)->OrderBy('ClasseName', 'desc')->get();
         return $data;
     }
 }
