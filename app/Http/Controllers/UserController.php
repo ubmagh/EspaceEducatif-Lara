@@ -226,4 +226,51 @@ class UserController extends Controller
         }
         return $ret;
     }
+
+
+    public function ChangeEmail(Request $request){
+
+        try {
+            if (!$user = JWTAuth::parseToken()->authenticate()) {
+                return response()->json(['error' => 'userNotFound'], 404);
+            }
+        } catch (TokenExpiredException $e) {
+            return response()->json(["error" => 'token_expired']);
+        } catch (TokenInvalidException $e) {
+            return response()->json(["error" => 'token_invalid']);
+        } catch (JWTException $e) {
+            return response()->json(["error" => 'token_absent']);
+        }
+
+
+        //// validate data types
+        $validator = Validator::make($request->json()->all(), [
+            'email' => 'required|string|email|max:255',
+            'password' => 'required|string|min:6',
+        ]);
+        if ($validator->fails()) {
+            return response()->json(['error' => 'ValidationError', 'content' => $validator->errors()], 200, ['Content-Type' => 'application/json']);
+        }
+
+
+        /// validate password
+        if ( ! Hash::check($request->json()->get('password')."", $user->password) ){
+            return response()->json(['error' => 'PwDErr']);
+        }
+
+        $checkEmailExist = DB::table('users')->select('id')->where('email',$request->json()->get('email')."")->first();
+        if(!empty($checkEmailExist))
+        if( $checkEmailExist->id."" == $user->id."" ){
+            return response()->json(['error' => 'SameEmail'], 200, ['Content-Type' => 'application/json']);
+        }else if( strlen($checkEmailExist->id."") !=0 ){
+            return response()->json(['error' => 'EmailTaken'], 200, ['Content-Type' => 'application/json']);
+        }
+
+        $user->email= $request->json()->get('email');
+        $user->save();
+
+        return response()->json(['error' => 'none'], 200, ['Content-Type' => 'application/json']);
+    }
+
+
 }

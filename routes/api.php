@@ -43,10 +43,15 @@ Route::prefix('classes')->group(function () {
     Route::get('GetClassesList', 'UserController@GetClassesList'); /// Get all classes list
 });
 
-
 ///// End Classe Routes
 
 
+
+/////parametres Routes
+Route::prefix('Settings')->group(function () {
+    Route::post('ChangeEmail', 'UserController@ChangeEmail'); /// initial classe list just 5 classes randomly
+});
+///// End parametres Routes
 
 Route::middleware('api')->get('user', function (Request $request) {
     return $request->user();
