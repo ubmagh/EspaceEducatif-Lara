@@ -273,4 +273,41 @@ class UserController extends Controller
     }
 
 
+
+    public function ChangePwD(Request $request){
+
+
+        try {
+            if (!$user = JWTAuth::parseToken()->authenticate()) {
+                return response()->json(['error' => 'userNotFound'], 404);
+            }
+        } catch (TokenExpiredException $e) {
+            return response()->json(["error" => 'token_expired']);
+        } catch (TokenInvalidException $e) {
+            return response()->json(["error" => 'token_invalid']);
+        } catch (JWTException $e) {
+            return response()->json(["error" => 'token_absent']);
+        }
+
+
+        //// validate data types
+        $validator = Validator::make($request->json()->all(), [
+            'OldPwd' => 'required|string|min:6',
+            'NewPwd' => 'required|string|min:6',
+        ]);
+        if ($validator->fails()) {
+            return response()->json(['error' => 'ValidationError', 'content' => $validator->errors()], 200, ['Content-Type' => 'application/json']);
+        }
+
+        /// validate password
+        if ( ! Hash::check($request->json()->get('OldPwd')."", $user->password) ){
+            return response()->json(['error' => 'PwDErr']);
+        }
+
+        $user->password = Hash::make($request->json()->get('NewPwd'));
+        $user->save();
+
+        return response()->json(['error' => 'none'], 200, ['Content-Type' => 'application/json']);
+    }
+
 }

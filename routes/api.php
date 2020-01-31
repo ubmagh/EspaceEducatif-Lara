@@ -49,7 +49,8 @@ Route::prefix('classes')->group(function () {
 
 /////parametres Routes
 Route::prefix('Settings')->group(function () {
-    Route::post('ChangeEmail', 'UserController@ChangeEmail'); /// initial classe list just 5 classes randomly
+    Route::post('ChangeEmail', 'UserController@ChangeEmail'); ///changer l'email
+    Route::post('ChangePwD', 'UserController@ChangePwD'); ///changer le mot de passe
 });
 ///// End parametres Routes
 
