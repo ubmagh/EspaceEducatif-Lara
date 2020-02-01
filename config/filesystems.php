@@ -63,6 +63,10 @@ return [
             'bucket' => env('AWS_BUCKET'),
             'url' => env('AWS_URL'),
         ],
+        'Avatars_upload' => [
+            'driver' => 'local',
+            'root'   => public_path() . '/images/Avatars',
+        ],
 
     ],
 

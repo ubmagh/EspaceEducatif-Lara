@@ -18,6 +18,7 @@ class CreateContactsTable extends Migration
             $table->string('email');
             $table->string('name');
             $table->text('message');
+            $table->string('type',20);
             $table->timestamp('date')->default('CURRENT_TIMESTAMP');
         });
     }

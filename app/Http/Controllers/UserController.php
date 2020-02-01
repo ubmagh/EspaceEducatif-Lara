@@ -8,6 +8,8 @@ use App\Etudiant;
 use App\professeur;
 use Exception;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
 
@@ -78,7 +80,7 @@ class UserController extends Controller
             'CIN' => 'required|string|max:10|min:6',
         ]);
         if ($validator->fails()) {
-            return response()->json(['status' => 'ValidationError', 'content' => $validator->errors()], 400, ['Content-Type' => 'application/json']);
+            return response()->json(['status' => 'ValidationError', 'content' => $validator->errors()], 200, ['Content-Type' => 'application/json']);
         }
 
         try {
@@ -91,7 +93,7 @@ class UserController extends Controller
             ]);
             $FstInsert = true;
         } catch (Exception $exc) {
-            return response()->json(['status' => 'DBError', 'content' => $exc . ""], 400, ['Content-Type' => 'application/json']);
+            return response()->json(['status' => 'DBError', 'content' => $exc . ""], 200, ['Content-Type' => 'application/json']);
         }
 
         if ($request->json()->get('Sex') . "" == "M")
@@ -113,7 +115,7 @@ class UserController extends Controller
         } catch (Exception $exc) {
             if ($FstInsert)
                 $user->delete();
-            return response()->json(['status' => 'DBError', 'content' => $exc . ""], 400, ['Content-Type' => 'application/json']);
+            return response()->json(['status' => 'DBError', 'content' => $exc . ""], 200, ['Content-Type' => 'application/json']);
         }
 
         //make default avatar for user
@@ -289,7 +291,6 @@ class UserController extends Controller
             return response()->json(["error" => 'token_absent']);
         }
 
-
         //// validate data types
         $validator = Validator::make($request->json()->all(), [
             'OldPwd' => 'required|string|min:6',
@@ -308,6 +309,157 @@ class UserController extends Controller
         $user->save();
 
         return response()->json(['error' => 'none'], 200, ['Content-Type' => 'application/json']);
+    }
+
+
+    public function ChangeAva(Request $request){
+
+        try {
+            if (!$user = JWTAuth::parseToken()->authenticate()) {
+                return response()->json(['error' => 'userNotFound'], 404);
+            }
+        } catch (TokenExpiredException $e) {
+            return response()->json(["error" => 'token_expired']);
+        } catch (TokenInvalidException $e) {
+            return response()->json(["error" => 'token_invalid']);
+        } catch (JWTException $e) {
+            return response()->json(["error" => 'token_absent']);
+        }
+
+        // return $request->file('imgFile')->isValid()?"true":"false"; /// check valide file 
+
+        
+
+        //// validate data types
+        $validator = Validator::make($request->all(), [
+            'imgFile' => 'required|image|dimensions:max_width=600,max_height=600',
+            'password' => 'required|string|min:6',
+        ]);
+        if ($validator->fails() || !$request->file('imgFile')->isValid()) {
+            return response()->json(['error' => 'ValidationError', 'content' => $validator->errors()], 200, ['Content-Type' => 'application/json']);
+        }
+
+         /// validate password
+         if ( ! Hash::check($request->input('password')."", $user->password) ){
+            return response()->json(['error' => 'PwDErr']);
+        }
+
+        if($user->UserType=="prof"){
+        $UT = professeur::where('email',$user->email)->first();
+        if($UT->AvatarPath != "DefTM.png" && $UT->AvatarPath != "DefTF.png")
+        File::delete( public_path()."/images/Avatars/".$UT->AvatarPath );
+        }
+        else{
+        $UT = Etudiant::where('email',$user->email)->first();
+        if($UT->AvatarPath != "DefM.png" && $UT->AvatarPath != "DefF.png")
+        File::delete( public_path()."/images/Avatars/".$UT->AvatarPath );
+        
+        }
+
+
+
+        $file = $request->file('imgFile');
+
+        $extension=$file->extension(); /// get file extension
+
+        
+        $UT->AvatarPath= $user->id.'.'.$extension;
+        $UT->save();
+
+        
+
+        Storage::disk('Avatars_upload')->putFileAs('', $file,$user->id.'.'.$extension) ;
+
+        return response()->json(['error' => 'none']);
+    }
+
+
+
+    public function DefAvatar(Request $request){
+
+        try {
+            if (!$user = JWTAuth::parseToken()->authenticate()) {
+                return response()->json(['error' => 'userNotFound'], 404);
+            }
+        } catch (TokenExpiredException $e) {
+            return response()->json(["error" => 'token_expired']);
+        } catch (TokenInvalidException $e) {
+            return response()->json(["error" => 'token_invalid']);
+        } catch (JWTException $e) {
+            return response()->json(["error" => 'token_absent']);
+        }
+
+        $validator = Validator::make($request->json()->all(), [
+            'password' => 'required|string|min:6',
+        ]);
+        if ($validator->fails()) {
+            return response()->json(['error' => 'ValidationError', 'content' => $validator->errors()], 200, ['Content-Type' => 'application/json']);
+        }
+
+        if ( ! Hash::check($request->json()->get('password')."", $user->password) ){
+            return response()->json(['error' => 'PwDErr']);
+        }
+
+        if($user->UserType=="prof"){
+            $UT = professeur::where('email',$user->email)->first();
+            if($UT->AvatarPath != "DefTM.png" && $UT->AvatarPath != "DefTF.png")
+                File::delete( public_path()."/images/Avatars/".$UT->AvatarPath );
+            if($UT->Sex=="M")
+                $UT->AvatarPath= "DefTM.png";
+            else
+                $UT->AvatarPath="DefTF.png";
+            }
+            else{
+            $UT = Etudiant::where('email',$user->email)->first();
+            if($UT->AvatarPath != "DefM.png" && $UT->AvatarPath != "DefF.png")
+            File::delete( public_path()."/images/Avatars/".$UT->AvatarPath );
+            if($UT->Sex=="M")
+                $UT->AvatarPath= "DefM.png";
+            else
+                $UT->AvatarPath="DefF.png";       
+            }
+
+        
+        $UT->save();
+        return response()->json(['error' => 'none']);
+    }
+
+
+    public function Help(Request $request){
+
+        try {
+            if (!$user = JWTAuth::parseToken()->authenticate()) {
+                return response()->json(['error' => 'userNotFound'], 404);
+            }
+        } catch (TokenExpiredException $e) {
+            return response()->json(["error" => 'token_expired']);
+        } catch (TokenInvalidException $e) {
+            return response()->json(["error" => 'token_invalid']);
+        } catch (JWTException $e) {
+            return response()->json(["error" => 'token_absent']);
+        }
+
+
+        $validator = Validator::make($request->all(), [
+            'message' => 'required|string|min:10|max:1200',
+        ]);
+        if ($validator->fails()) {
+            return response()->json(['error' => 'ValidationError', 'content' => $validator->errors()], 200, ['Content-Type' => 'application/json']);
+        }
+        
+        $name = "";
+        if($user->UserType."" == "prof"){
+            $tmp= professeur::where('email',$user->email)->first();
+            $name= $tmp->Lname." ".$tmp->Fname;
+        }else{
+            $tmp= Etudiant::where('email',$user->email)->first();
+            $name= $tmp->Lname." ".$tmp->Fname;
+        }
+
+        if(app('App\Http\Controllers\ContactController')->Help( $user->email,$name,$request->message ))
+        return response()->json(['error' => 'none', 'content' => $validator->errors()], 200, ['Content-Type' => 'application/json']);
+        else
+        return response()->json(['error' => 'Failed', 'content' => $validator->errors()], 200, ['Content-Type' => 'application/json']);
     }
 
 }

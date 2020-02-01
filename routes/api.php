@@ -23,6 +23,9 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 Route::post('/NewContact', 'ContactController@New');
 
 
+//// contactes d'aide des membres 
+Route::get('Help', 'UserController@Help');
+
 
 ///// capturer les données envoyées depuis la page de registre d'un nouveau etudiant
 Route::post('register', 'UserController@register');
@@ -47,10 +50,16 @@ Route::prefix('classes')->group(function () {
 
 
 
+
+
+
 /////parametres Routes
 Route::prefix('Settings')->group(function () {
     Route::post('ChangeEmail', 'UserController@ChangeEmail'); ///changer l'email
     Route::post('ChangePwD', 'UserController@ChangePwD'); ///changer le mot de passe
+    Route::post('ChangeAva', 'UserController@ChangeAva'); ///changer l'image de profile
+    Route::post('DefAvatar', 'UserController@DefAvatar'); /// image de profle par defaut
+
 });
 ///// End parametres Routes
 

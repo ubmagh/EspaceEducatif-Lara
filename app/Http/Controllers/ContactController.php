@@ -31,7 +31,7 @@ class ContactController extends Controller
 
 
         if (
-            DB::insert('insert into contacts (email, name, message, date) values (?, ?, ?, CURRENT_TIMESTAMP)', [$email, $name, $message])
+            DB::insert('insert into contacts (email, name, message, type, date) values (?, ?, ?, ?, CURRENT_TIMESTAMP)', [$email, $name, $message,"externe"])
         )
             /* //another way to do it but not working in this case
         DB::table('contacts')->insert(
@@ -43,5 +43,13 @@ class ContactController extends Controller
 
         else
             return "false";
+    }
+
+    public function Help(string $email,string $name,string $message){
+        if(
+            DB::insert('insert into contacts (email, name, message, type, date) values (?, ?, ?, ?, CURRENT_TIMESTAMP)', [$email, $name, $message,"interne"])
+        )
+        return true;
+        return false; 
     }
 }
