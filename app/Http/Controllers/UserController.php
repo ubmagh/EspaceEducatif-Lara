@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
-
+use PhpParser\JsonDecoder;
 //use JWTAuth;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use Tymon\JWTAuth\Facades\JWTFactory;
@@ -368,7 +368,7 @@ class UserController extends Controller
 
         
 
-        Storage::disk('Avatars_upload')->putFileAs('', $file,$user->id.'.'.$extension) ;
+        Storage::disk('Avatars_upload')->putFileAs('', $file,$user->id.'.'.$extension) ; /// forget about it it is working
 
         return response()->json(['error' => 'none']);
     }
@@ -461,5 +461,63 @@ class UserController extends Controller
         else
         return response()->json(['error' => 'Failed', 'content' => $validator->errors()], 200, ['Content-Type' => 'application/json']);
     }
+
+
+    public function GetClasseInfos(Request $request){
+
+        try {
+            if (!$user = JWTAuth::parseToken()->authenticate()) {
+                return response()->json(['error' => 'userNotFound'], 404);
+            }
+        } catch (TokenExpiredException $e) {
+            return response()->json(["error" => 'token_expired']);
+        } catch (TokenInvalidException $e) {
+            return response()->json(["error" => 'token_invalid']);
+        } catch (JWTException $e) {
+            return response()->json(["error" => 'token_absent']);
+        }
+
+        if(!empty($request->all()['ClasseID']))
+        $ClasseID = $request->all()['ClasseID'];
+
+
+        $validator = Validator::make($request->all(), [
+            'ClasseID' => 'required|int|min:1',
+        ]);
+        if ($validator->fails()) {
+            return response()->json(['error' => 'ValidationError', 'content' => $validator->errors()], 200, ['Content-Type' => 'application/json']);
+        }
+        /// check if current user has access to the classe 
+        
+
+        if($user->UserType=="prof"){
+        $UT = professeur::where('email',$user->email)->first();
+        if( ! app('App\Http\Controllers\ClasseController')->checkProfAccess($UT->id , $ClasseID ) )
+            return response()->json(['error' => 'Access Forbidden', 'content' => $validator->errors()], 200, ['Content-Type' => 'application/json']); 
+        }
+        else{
+        $UT = Etudiant::where('email',$user->email)->first();
+        if( ! app('App\Http\Controllers\ClasseController')->checkEtudiantAccess( $UT->Filiere, $UT->Annee , $ClasseID )  )
+        return response()->json(['error' => 'Access Forbidden', 'content' => $validator->errors()], 200, ['Content-Type' => 'application/json']); 
+         }
+
+
+        $data = app('App\Http\Controllers\ClasseController')->GetClasseInfos( $ClasseID )[0];
+        $Teacher= professeur::find($data->ProfID)->get()[0];
+
+        $data->ImagePath="http://localhost:8000/images/ClassesWalls/".$data->ImagePath;
+
+         return response()->json(['error' => 'none', 'data' => ['profName'=> $Teacher->Lname." ".$Teacher->Fname , "classeData" => $data ] ], 200, ['Content-Type' => 'application/json']);
+    }
+
+
+
+
+
+
+
+
+
+
 
 }

@@ -63,6 +63,36 @@ Route::prefix('Settings')->group(function () {
 });
 ///// End parametres Routes
 
+
+
+
+
+
+
+
+
+//// Classes Routes
+Route::prefix('Classes')->group(function () {
+    Route::get('ClassInfo', 'UserController@GetClasseInfos'); ///changer l'email
+
+});
+
+
+/////// End of Classes Routes
+
+
+
+
+
+
+
+
+
+
+
+
+
+///// the next one i don't why it is there !
 Route::middleware('api')->get('user', function (Request $request) {
     return $request->user();
 });

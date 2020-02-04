@@ -8,7 +8,7 @@ class classe extends Model
 {
     //
     protected $fillable = [
-        'ClasseName', 'Filiere', 'Annee', 'ProfID',
+        'ClasseName', 'Filiere', 'Annee', 'ProfID','ImagePath'
     ];
 
     protected $table = 'classes';

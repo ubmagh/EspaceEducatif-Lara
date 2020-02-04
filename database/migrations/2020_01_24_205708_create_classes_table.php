@@ -18,6 +18,7 @@ class CreateClassesTable extends Migration
             $table->string('ClasseName', 50);
             $table->string('Filiere', 5);
             $table->string('Annee', 5);
+            $table->string('ImagePath')->default('1600x400.png');
             $table->bigInteger('ProfID');
 
 
