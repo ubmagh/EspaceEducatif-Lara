@@ -2,6 +2,7 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 class CreateClassesTable extends Migration
@@ -24,6 +25,15 @@ class CreateClassesTable extends Migration
 
             $table->foreign('ProfID')->references('id')->on('professeurs')->onDelete('cascade');
         });
+        DB::table('classes')->insert(
+            array(
+                'ClasseName' => 'Mathématiques : Analyse 2',
+                'Filiere'=>'GI',
+                'Annee' => '2',
+                'ImagePath'=>'1600x400.png',
+                'ProfID'=>'1'
+            )
+        );
     }
 
     /**

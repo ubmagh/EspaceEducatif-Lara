@@ -9,7 +9,7 @@ class Etudiant extends Model
     //
 
     protected $fillable = [
-        'Fname', 'Lname', 'email', 'Filiere', 'Sex', 'Annee', 'CIN', 'AvatarPath'
+        'Fname', 'Lname', 'email', 'Filiere', 'Sex', 'Annee', 'CIN', 'AvatarPath','dateNaissance'
     ];
 
 

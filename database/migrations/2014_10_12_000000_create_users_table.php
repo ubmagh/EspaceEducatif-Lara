@@ -2,6 +2,7 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 class CreateUsersTable extends Migration
@@ -22,6 +23,29 @@ class CreateUsersTable extends Migration
             $table->string('UserType', 20);
             $table->boolean('Activated');
         });
+
+        DB::table('users')->insert(
+            array(
+                'email' => 'ubmagh@gmail.com',
+                'password' => '$2y$10$HVeWX4ufmCL5chB1VQXTeeAg7QfklO3thHrKRw5vn0zPjqhPkHbMa',
+                'LastLogin'=>null,
+                'CreatedAt'=>'2020/01/02',
+                'UserType'=>'etud',
+                'Activated'=>'1'
+            )
+        );
+        DB::table('users')->insert(
+            array(
+                'email' => 'ubmagh2@gmail.com',
+                'password' => '$2y$10$HVeWX4ufmCL5chB1VQXTeeAg7QfklO3thHrKRw5vn0zPjqhPkHbMa',
+                'LastLogin'=>null,
+                'CreatedAt'=>'2020/01/02',
+                'UserType'=>'prof',
+                'Activated'=>'1'
+            )
+        );
+
+        
     }
 
     /**

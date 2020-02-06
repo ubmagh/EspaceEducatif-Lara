@@ -17,7 +17,7 @@ class CreatePostsTable extends Migration
             $table->bigIncrements('id');
             $table->bigInteger('classId');
             $table->timestamp('date');
-            $table->text('ContentText');
+            $table->longText('Text');
             $table->bigInteger('userId');
             $table->boolean('Approuved')->default('false');
 

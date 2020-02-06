@@ -2,6 +2,7 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 class CreateProfesseursTable extends Migration
@@ -26,6 +27,19 @@ class CreateProfesseursTable extends Migration
 
             $table->foreign('email')->references('email')->on('users')->onDelete('cascade')->onUpdate('cascade');
         });
+
+        DB::table('professeurs')->insert(
+            array(
+                'Fname' => 'Omar',
+                'Lname'=>'Zemzami',
+                'email' => 'ubmagh2@gmail.com',
+                'Filiere'=>'GI',
+                'Sex'=>'M',
+                'Matiere'=>'Mathématiques',
+                'AvatarPath'=>'DefTM.png'
+            )
+        );
+
     }
 
     /**

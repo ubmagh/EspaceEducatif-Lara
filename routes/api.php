@@ -49,8 +49,11 @@ Route::prefix('classes')->group(function () {
 ///// End Classe Routes
 
 
-
-
+//// Postes Routes
+Route::prefix('Postes')->group(function () {
+    Route::post('newIntoClasse', 'UserController@NewClassPoste'); /// initial classe list just 5 classes randomly
+});
+//// End Postes Routes
 
 
 /////parametres Routes

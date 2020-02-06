@@ -76,6 +76,7 @@ class UserController extends Controller
             'password' => 'required|string|min:6',
             'Filiere' => 'required|string|max:3',
             'Annee' => 'required|string|max:1',
+            'DateNais'=> 'required|date|date_format:Y-m-d',
             'Sex' => 'required|string|max:1',
             'CIN' => 'required|string|max:10|min:6',
         ]);
@@ -111,6 +112,7 @@ class UserController extends Controller
                 'Annee' => trim(strip_tags($request->json()->get('Annee'))),
                 'CIN' => trim(strip_tags($request->json()->get('CIN'))),
                 'AvatarPath' => $AvatarPath,
+                'dateNaissance' => $request->json()->get('DateNais'),
             ]);
         } catch (Exception $exc) {
             if ($FstInsert)
@@ -511,8 +513,35 @@ class UserController extends Controller
     }
 
 
+    public function NewClassPoste(Request $request){
+
+        try {
+            if (!$user = JWTAuth::parseToken()->authenticate()) {
+                return response()->json(['error' => 'userNotFound'], 404);
+            }
+        } catch (TokenExpiredException $e) {
+            return response()->json(["error" => 'token_expired']);
+        } catch (TokenInvalidException $e) {
+            return response()->json(["error" => 'token_invalid']);
+        } catch (JWTException $e) {
+            return response()->json(["error" => 'token_absent']);
+        }
 
 
+        //// validation required ! 
+        $postID = app('App\Http\Controllers\PostController')->CreatePoste_ReturnItsID($request->classID,$user->id,$request->pub,false);
+
+        $lngth = $request->lngth;
+
+        $Files = [];
+
+        for($i=0;$i<$lngth;$i++)
+        array_push($Files,$request->{"File".$i});
+
+        return   $Files[0]->extension();
+        
+
+    }
 
 
 
