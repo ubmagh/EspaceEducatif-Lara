@@ -528,8 +528,21 @@ class UserController extends Controller
         }
 
 
-        //// validation required ! 
+        //// validation required ! before creating post into classe
+        if($user->UserType=="prof"){
+
+            $prof=professeur::where('email',$user->email)->get();
+           if ( DB::select("select count(*) as num from classes where id=? and ProfID=?", [$request->classID,$prof->id])[0]->num ==0 )
+           return   response()->json(['status' => 'NonAuth', 'content' => "Acces not permitted"], 200, ['Content-Type' => 'application/json']);
+
+        }else{
+            $student = Etudiant::where('email',$user->email)->First();
+            if ( DB::select("select Filiere+Annee as combi from classes where id=?", [$request->classID])[0]->combi != $student->Filiere.$student->Annee )
+           return   response()->json(['status' => 'NonAuth', 'content' => "Acces not permitted"], 200, ['Content-Type' => 'application/json']);
+        }
         $postID = app('App\Http\Controllers\PostController')->CreatePoste_ReturnItsID($request->classID,$user->id,$request->pub,false);
+
+
 
         $lngth = $request->lngth;
 
@@ -537,14 +550,73 @@ class UserController extends Controller
 
         for($i=0;$i<$lngth;$i++)
         array_push($Files,$request->{"File".$i});
+        
 
-        return   $Files[0]->extension();
+        for($i=0;$i<$lngth;$i++){
+
+            /// placer les uploads dans un dossier TMP pour vérifier leurs types
+            $path= Storage::disk('TMP')->put('',$Files[$i]);
+            $extension = mime_content_type( storage_path('app\Classes\TMP').'\\'.$path );
+            $size = $Files[$i]->getSize();
+            app('App\Http\Controllers\MediaController')->CreateMedia( $postID, $user->id, $extension, $Files[$i]->getClientOriginalName(), $path,$size );
+        }
+
+        
+        return   response()->json(['status' => 'Succes', 'content' => "succeded"], 200, ['Content-Type' => 'application/json']);
         
 
     }
 
 
+    public function Posts(Request $request){
+        try {
+            if (!$user = JWTAuth::parseToken()->authenticate()) {
+                return response()->json(['error' => 'userNotFound'], 404);
+            }
+        } catch (TokenExpiredException $e) {
+            return response()->json(["error" => 'token_expired']);
+        } catch (TokenInvalidException $e) {
+            return response()->json(["error" => 'token_invalid']);
+        } catch (JWTException $e) {
+            return response()->json(["error" => 'token_absent']);
+        }
 
+        /// validate access to class posts 
+        //// c'est une validation sur les apis non sur les classes allright then ?
+        if($user->UserType=="prof"){
+            $prof=professeur::where('email',$user->email)->get();
+           if ( DB::select("select count(*) as num from classes where id=? and ProfID=?", [$request->classID,$prof->id])[0]->num ==0 )
+           return   response()->json(['status' => 'NonAuth', 'content' => "Acces not permitted"], 200, ['Content-Type' => 'application/json']);
+
+        }else{
+            $student = Etudiant::where('email',$user->email)->First();
+            if ( DB::select("select Filiere+Annee as combi from classes where id=?", [$request->classID])[0]->combi != $student->Filiere.$student->Annee )
+           return   response()->json(['status' => 'NonAuth', 'content' => "Acces not permitted"], 200, ['Content-Type' => 'application/json']);
+        }
+
+        return app('App\Http\Controllers\PostController')->GetPosts($request->classID);
+
+    }
+
+
+    public function PosterInfos(string $userID){
+        $user = User::find($userID);
+        $name="";
+        $type="";
+        if($user->UserType == "prof"){
+            $prof = professeur::where('email',$user->email)->first();
+            $type="prof";
+            $name=$prof->Lname." ".$prof->Fname;
+            $pic=$prof->AvatarPath;
+        }else{
+            $etud = Etudiant::where('email',$user->email)->first();
+            $type="etud";
+            $name=$etud->Lname." ".$etud->Fname;
+            $pic=$etud->AvatarPath;
+        }
+        $pic="http://localhost:8000/images/Avatars/".$pic;
+        return ['name'=>$name,"type"=>$type,"id"=>$userID,"pic"=>$pic];
+    }
 
 
 

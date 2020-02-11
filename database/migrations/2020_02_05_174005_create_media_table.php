@@ -19,8 +19,9 @@ class CreateMediaTable extends Migration
             $table->bigInteger('PostID')->nullable();
             $table->bigInteger('PosterID');
             $table->string('type');
-            $table->string('path');
-
+            $table->string('path');/// contains name and extension of stored file
+            $table->string('originalName');// Name to return to user in Download 
+            $table->integer('size');
 
             $table->foreign('PosterID')->references('id')->on('users')->onDelete('cascade')->onUpdate('cascade');
             $table->foreign('PostID')->references('id')->on('posts')->onUpdate('cascade');

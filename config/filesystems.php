@@ -67,6 +67,19 @@ return [
             'driver' => 'local',
             'root'   => public_path() . '/images/Avatars',
         ],
+        
+        'TMP'=> [
+            'driver' => 'local',
+            'root'   => storage_path('app/Classes/TMP'),
+            'visibility' => 'private',
+        ],
+
+        'Classes'=> [
+            'driver' => 'local',
+            'root'   => storage_path('app/Classes'),
+            'visibility' => 'private',
+
+        ],
 
     ],
 
