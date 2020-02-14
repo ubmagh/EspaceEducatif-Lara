@@ -34,6 +34,9 @@ class CreateUsersTable extends Migration
                 'Activated'=>'1'
             )
         );
+
+
+
         DB::table('users')->insert(
             array(
                 'email' => 'ubmagh2@gmail.com',

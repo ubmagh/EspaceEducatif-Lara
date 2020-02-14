@@ -3,9 +3,13 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+
+////models
 use App\User;
 use App\Etudiant;
 use App\professeur;
+use App\Permission;
+use App\post;
 use Exception;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
@@ -114,6 +118,11 @@ class UserController extends Controller
                 'AvatarPath' => $AvatarPath,
                 'dateNaissance' => $request->json()->get('DateNais'),
             ]);
+            $permission = Permission::create([
+                'EtudiantID'=>$etud->id,
+                 'posting'=>true, 
+                 'commenting'=>true, 
+            ]);
         } catch (Exception $exc) {
             if ($FstInsert)
                 $user->delete();
@@ -135,14 +144,14 @@ class UserController extends Controller
         $datee = $request->all();
         try {
             if (!$user = JWTAuth::parseToken()->authenticate()) {
-                return response()->json(['error' => 'userNotFound'], 404);
+                return response()->json(['error' => 'userNotFound'], 200);
             }
         } catch (TokenExpiredException $e) {
-            return response()->json(["error" => 'token_expired']);
+            return response()->json(["error" => 'token_expired'],200);
         } catch (TokenInvalidException $e) {
-            return response()->json(["error" => 'token_invalid']);
+            return response()->json(["error" => 'token_invalid'],200);
         } catch (JWTException $e) {
-            return response()->json(["error" => 'token_absent']);
+            return response()->json(["error" => 'token_absent'],200);
         }
 
         DB::update("update users set LastLogin = '" . $datee["LastLogDate"] . "' where id = ? ", [$user->id]);
@@ -536,7 +545,14 @@ class UserController extends Controller
            return   response()->json(['status' => 'NonAuth', 'content' => "Acces not permitted"], 200, ['Content-Type' => 'application/json']);
 
         }else{
+            
             $student = Etudiant::where('email',$user->email)->First();
+
+            ////Check posting permissions First !
+            if( !app('App\Http\Controllers\PermissionController')->CheckEtud_Permitted($student->id)  )
+           return   response()->json(['status' => 'permission', 'content' => "Acces not permitted"], 200, ['Content-Type' => 'application/json']);
+
+            
             if ( DB::select("select Filiere+Annee as combi from classes where id=?", [$request->classID])[0]->combi != $student->Filiere.$student->Annee )
            return   response()->json(['status' => 'NonAuth', 'content' => "Acces not permitted"], 200, ['Content-Type' => 'application/json']);
         }
@@ -571,14 +587,14 @@ class UserController extends Controller
     public function Posts(Request $request){
         try {
             if (!$user = JWTAuth::parseToken()->authenticate()) {
-                return response()->json(['error' => 'userNotFound'], 404);
+                return response()->json(['error' => 'userNotFound'], 200);
             }
         } catch (TokenExpiredException $e) {
-            return response()->json(["error" => 'token_expired']);
+            return response()->json(["error" => 'token_expired'], 200);
         } catch (TokenInvalidException $e) {
-            return response()->json(["error" => 'token_invalid']);
+            return response()->json(["error" => 'token_invalid'], 200);
         } catch (JWTException $e) {
-            return response()->json(["error" => 'token_absent']);
+            return response()->json(["error" => 'token_absent'], 200);
         }
 
         /// validate access to class posts 
@@ -594,7 +610,7 @@ class UserController extends Controller
            return   response()->json(['status' => 'NonAuth', 'content' => "Acces not permitted"], 200, ['Content-Type' => 'application/json']);
         }
 
-        return app('App\Http\Controllers\PostController')->GetPosts($request->classID);
+        return app('App\Http\Controllers\PostController')->GetPosts($request->classID,$user->id);
 
     }
 
@@ -619,6 +635,92 @@ class UserController extends Controller
     }
 
 
+    public function NewComment(Request $request){
+
+        try {
+            if (!$user = JWTAuth::parseToken()->authenticate()) {
+                return response()->json(['error' => 'userNotFound'], 200);
+            }
+        } catch (TokenExpiredException $e) {
+            return response()->json(["error" => 'token_expired'], 200);
+        } catch (TokenInvalidException $e) {
+            return response()->json(["error" => 'token_invalid'], 200);
+        } catch (JWTException $e) {
+            return response()->json(["error" => 'token_absent'], 200);
+        }
+        $post = post::find($request->postID);
+        if($user->UserType==="prof"){
+            $prof = professeur::where('email',$user->email)->first();
+            if( ! app('App\Http\Controllers\ClasseController')->checkProfAccess($prof->id , $post->classId ))
+            return response()->json(['status' => 'NotPermitted', 'content' => "Acces not permitted"], 200, ['Content-Type' => 'application/json']);
+        }else{
+            $etud = Etudiant::where('email',$user->email)->first();
+            if(! app('App\Http\Controllers\ClasseController')->checkEtudiantAccess( $etud->Filiere, $etud->Annee , $post->classId ) )
+            return response()->json(['status' => 'NotPermitted', 'content' => "Acces not permitted"], 200, ['Content-Type' => 'application/json']);
+        }
+
+        $comment = app('App\Http\Controllers\CommentController')->NewCommento($post->id,$user->id,$request->Comment);
+
+        return  response()->json(['status' => 'successed', 'content' =>  $comment], 200, ['Content-Type' => 'application/json']);
+    }
+
+
+
+    public function Like(Request $request){
+
+        try {
+            if (!$user = JWTAuth::parseToken()->authenticate()) {
+                return response()->json(['error' => 'userNotFound'], 200);
+            }
+        } catch (TokenExpiredException $e) {
+            return response()->json(["error" => 'token_expired'], 200);
+        } catch (TokenInvalidException $e) {
+            return response()->json(["error" => 'token_invalid'], 200);
+        } catch (JWTException $e) {
+            return response()->json(["error" => 'token_absent'], 200);
+        }
+
+        $post = post::find($request->postID);
+        if($user->UserType==="prof"){
+            $prof = professeur::where('email',$user->email)->first();
+            if( ! app('App\Http\Controllers\ClasseController')->checkProfAccess($prof->id , $post->classId ))
+            return response()->json(['status' => 'NotPermitted', 'content' => "Acces not permitted"], 200, ['Content-Type' => 'application/json']);
+        }else{
+            $etud = Etudiant::where('email',$user->email)->first();
+            if(! app('App\Http\Controllers\ClasseController')->checkEtudiantAccess( $etud->Filiere, $etud->Annee , $post->classId ) )
+            return response()->json(['status' => 'NotPermitted', 'content' => "Acces not permitted"], 200, ['Content-Type' => 'application/json']);
+        }
+
+        if( app('App\Http\Controllers\LikeController')->LikeIt($user->id, $post->id) )
+        return  response()->json(['status' => 'successed'], 200, ['Content-Type' => 'application/json']);
+
+        return  response()->json(['status' => 'NotSuccessed'], 200, ['Content-Type' => 'application/json']);
+
+    }
+
+
+    public function GetClassProf(Request $request){
+
+        try {
+            if (!$user = JWTAuth::parseToken()->authenticate()) {
+                return response()->json(['error' => 'userNotFound'], 200);
+            }
+        } catch (TokenExpiredException $e) {
+            return response()->json(["error" => 'token_expired'], 200);
+        } catch (TokenInvalidException $e) {
+            return response()->json(["error" => 'token_invalid'], 200);
+        } catch (JWTException $e) {
+            return response()->json(["error" => 'token_absent'], 200);
+        }
+
+        $Classe = app('App\Http\Controllers\ClasseController')->GetClasseInfos($request->classID)[0];
+
+        $prof= professeur::find($Classe->ProfID);
+        $tab=['idProf'=>$prof->id,'name'=>$prof->Lname." ".$prof->Fname,'pic'=>"http://localhost:8000/images/Avatars/".$prof->AvatarPath];
+
+        return   response()->json(['status' => 'succeded',"content"=>$tab], 200, ['Content-Type' => 'application/json']);
+
+    }
 
 
 }

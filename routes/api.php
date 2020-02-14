@@ -78,7 +78,10 @@ Route::prefix('Settings')->group(function () {
 Route::prefix('Classes')->group(function () {
     Route::get('ClassInfo', 'UserController@GetClasseInfos'); ///changer l'email
     Route::get('Posts','UserController@Posts'); //// retournera les premiers postes a afficher 8 max aprés getMore va charger 4 par 4
-});
+    Route::get('Comment','UserController@NewComment'); //// Commenter une publication
+    Route::get('Like','UserController@Like');
+    Route::get('GetClassesProf','UserController@GetClassProf');
+}); 
 
 
 /////// End of Classes Routes
