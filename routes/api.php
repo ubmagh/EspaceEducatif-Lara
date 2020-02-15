@@ -39,6 +39,11 @@ Route::post('login', 'UserController@Login');
 Route::get('TokenVerification', 'UserController@getAuthenticatedUser');
 
 
+/////// retoourne les infos à afficher sur le profile
+Route::get('Profile', 'UserController@MyProfileData');
+
+//// Obtenir la Dérniére connexion
+Route::get('LastLogin', 'UserController@LastLogin');
 
 /////Classe Routes
 Route::prefix('classes')->group(function () {

@@ -723,4 +723,50 @@ class UserController extends Controller
     }
 
 
+
+    public function MyProfileData(Request $requst){
+
+        try {
+            if (!$user = JWTAuth::parseToken()->authenticate()) {
+                return response()->json(['error' => 'userNotFound'], 200);
+            }
+        } catch (TokenExpiredException $e) {
+            return response()->json(["error" => 'token_expired'], 200);
+        } catch (TokenInvalidException $e) {
+            return response()->json(["error" => 'token_invalid'], 200);
+        } catch (JWTException $e) {
+            return response()->json(["error" => 'token_absent'], 200);
+        }
+
+        if( $user->Usertype == "prof" ){
+
+            $prof = professeur::where('email',$user->email)->first();
+
+        }else{
+            $etud = Etudiant::where('email',$user->email)->first();
+            $created = str_split($user->CreatedAt,10);
+            $toret = ['Joined'=>$created[0],'Type'=>'etud',"infos"=>$etud];
+        }
+        $toret["infos"]->AvatarPath = "http://localhost:8000/images/Avatars/".$toret["infos"]->AvatarPath;
+        return response()->json(['status' => 'succeded',"content"=>$toret], 200, ['Content-Type' => 'application/json']);
+    }
+
+    public function LastLogin(Request $request){
+        try {
+            if (!$user = JWTAuth::parseToken()->authenticate()) {
+                return response()->json(['error' => 'userNotFound'], 200);
+            }
+        } catch (TokenExpiredException $e) {
+            return response()->json(["error" => 'token_expired'], 200);
+        } catch (TokenInvalidException $e) {
+            return response()->json(["error" => 'token_invalid'], 200);
+        } catch (JWTException $e) {
+            return response()->json(["error" => 'token_absent'], 200);
+        }
+
+        return response()->json(['status' => 'succeded',"content"=>$user->LastLogin], 200, ['Content-Type' => 'application/json']);
+
+    }
+
+
 }
