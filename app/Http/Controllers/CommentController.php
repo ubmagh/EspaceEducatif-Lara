@@ -18,7 +18,7 @@ class CommentController extends Controller
         return 0;
     }
     public function LastComment(string $PostID){
-        $com = DB::select('select top 1 * from comments order by date desc');
+        $com = DB::select('select top 1 * from comments where PostId=? order by date desc',[$PostID]);
         $com= (!empty($com[0]))?$com[0]:[]  ;
         if( !empty ($com) )
         return ['idc'=>$com->userId,'date'=>$com->date,'com'=>$com->Text];

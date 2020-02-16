@@ -57,4 +57,13 @@ class ClasseController extends Controller
         return false;
     }
 
+    
+
+    ///Best Part 
+
+    public function GetClassMates(string $classID){
+        $classe = classe::find($classID);
+        return ['F'=>$classe->Filiere,'A'=>$classe->Annee];
+    }
+
 }

@@ -41,10 +41,12 @@ class PostController extends Controller
         foreach($posts as $tmp){
         $commentor=[];
         $Comment = app('App\Http\Controllers\CommentController')->LastComment($tmp->id);
-        if(!empty($Comment))
+        if(!empty($Comment)){
         $commentor = app('App\Http\Controllers\UserController')->PosterInfos($Comment['idc']);
         $LastComment=array_merge($Comment,$commentor);
-        array_push($LastComments ,$LastComment);
+        array_push($LastComments ,$LastComment);}else{
+            array_push($LastComments ,[]);
+        }
 
         $post = ['PostID'=>$tmp->id,'date'=>$tmp->date,'text'=>$tmp->Text,'likes'=> app('App\Http\Controllers\LikeController')->NumLikes($tmp->id),"Comments"=>app('App\Http\Controllers\CommentController')->NumComments($tmp->id) ] ;
         array_push($Posts,$post);

@@ -45,6 +45,11 @@ Route::get('Profile', 'UserController@MyProfileData');
 //// Obtenir la Dérniére connexion
 Route::get('LastLogin', 'UserController@LastLogin');
 
+
+///// first step if accessing guest to profile 
+Route::get('CheckProfile', 'UserController@Check_Profile');
+
+
 /////Classe Routes
 Route::prefix('classes')->group(function () {
     Route::get('GetInitialClasses', 'UserController@GetInitialClasses'); /// initial classe list just 5 classes randomly

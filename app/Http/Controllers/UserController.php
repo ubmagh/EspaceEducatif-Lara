@@ -549,7 +549,7 @@ class UserController extends Controller
             $student = Etudiant::where('email',$user->email)->First();
 
             ////Check posting permissions First !
-            if( !app('App\Http\Controllers\PermissionController')->CheckEtud_Permitted($student->id)  )
+            if( !app('App\Http\Controllers\PermissionController')->CheckEtud_PostingPer($student->id)  )
            return   response()->json(['status' => 'permission', 'content' => "Acces not permitted"], 200, ['Content-Type' => 'application/json']);
 
             
@@ -657,6 +657,9 @@ class UserController extends Controller
             $etud = Etudiant::where('email',$user->email)->first();
             if(! app('App\Http\Controllers\ClasseController')->checkEtudiantAccess( $etud->Filiere, $etud->Annee , $post->classId ) )
             return response()->json(['status' => 'NotPermitted', 'content' => "Acces not permitted"], 200, ['Content-Type' => 'application/json']);
+            if( !app('App\Http\Controllers\PermissionController')->CommentPer($etud->id)  ){
+                return response()->json(['status' => 'Permission', 'content' => "Acces not permitted"], 200, ['Content-Type' => 'application/json']);
+            }
         }
 
         $comment = app('App\Http\Controllers\CommentController')->NewCommento($post->id,$user->id,$request->Comment);
@@ -714,11 +717,12 @@ class UserController extends Controller
         }
 
         $Classe = app('App\Http\Controllers\ClasseController')->GetClasseInfos($request->classID)[0];
-
         $prof= professeur::find($Classe->ProfID);
-        $tab=['idProf'=>$prof->id,'name'=>$prof->Lname." ".$prof->Fname,'pic'=>"http://localhost:8000/images/Avatars/".$prof->AvatarPath];
-
-        return   response()->json(['status' => 'succeded',"content"=>$tab], 200, ['Content-Type' => 'application/json']);
+        $useri = user::where('email',$prof->email)->first();
+        $tab=['id'=>$useri->id,'idProf'=>$prof->id,'name'=>$prof->Lname." ".$prof->Fname,'pic'=>"http://localhost:8000/images/Avatars/".$prof->AvatarPath];
+        $tmp =  app('App\Http\Controllers\ClasseController')->GetClassMates($request->classID);
+        $the6=app('App\Http\Controllers\EtudiantController')->Get6ClasseMates($tmp['F'],$tmp['A']);
+        return   response()->json(['status' => 'succeded',"content"=>$tab,'the6'=>$the6], 200, ['Content-Type' => 'application/json']);
 
     }
 
@@ -740,6 +744,7 @@ class UserController extends Controller
 
         if( $user->Usertype == "prof" ){
 
+            ///// TOdo
             $prof = professeur::where('email',$user->email)->first();
 
         }else{
@@ -767,6 +772,48 @@ class UserController extends Controller
         return response()->json(['status' => 'succeded',"content"=>$user->LastLogin], 200, ['Content-Type' => 'application/json']);
 
     }
+
+    public function Check_Profile(Request $request){
+
+        try {
+            if (!$user = JWTAuth::parseToken()->authenticate()) {
+                return response()->json(['error' => 'userNotFound'], 200);
+            }
+        } catch (TokenExpiredException $e) {
+            return response()->json(["error" => 'token_expired'], 200);
+        } catch (TokenInvalidException $e) {
+            return response()->json(["error" => 'token_invalid'], 200);
+        } catch (JWTException $e) {
+            return response()->json(["error" => 'token_absent'], 200);
+        }
+
+        $useri = User::find($request->userID);
+        
+        
+        if(!empty($useri)){
+            if($user->id==$useri->id)
+                return response()->json(['status' => 'succeded',"content"=>["Type"=>"self"]], 200, ['Content-Type' => 'application/json']);
+            else 
+                if ("admin"==$useri->id)
+                    return response()->json(['status' => 'succeded',"content"=>["Type"=>"notFound"]], 200, ['Content-Type' => 'application/json']);
+                else{
+
+                    if($useri->UserType =="prof"){
+                        $prof= professeur::where('email',$useri->email)->first();
+                        $data=[ 'Type'=>"prof", "name"=>$prof->Lname." ".$prof->Fname,'email'=>$prof->email, 'Filiere'=>$prof->Filiere, 'Sex'=>$prof->Sex, 'Matiere'=>$prof->Matiere,'pic'=>'http://localhost:8000/images/Avatars/'.$prof->AvatarPath ];
+                    }else if($useri->UserType =="etud"){
+                        $etud= Etudiant::where('email',$useri->email)->first();
+                        $data=[ 'Type'=>"etud", "name"=>$etud->Lname." ".$etud->Fname,'email'=>$etud->email, 'Filiere'=>$etud->Filiere, 'Sex'=>$etud->Sex, 'Annee'=>$etud->Annee,'dateNai'=>$etud->dateNaissance ,'pic'=>'http://localhost:8000/images/Avatars/'.$etud->AvatarPath ];
+                    }
+
+                    return response()->json(['status' => 'succeded',"content"=>$data], 200, ['Content-Type' => 'application/json']);
+                }
+            }
+        else
+            return response()->json(['status' => 'succeded',"content"=>["Type"=>"notFound"]], 200, ['Content-Type' => 'application/json']);
+    }
+
+
 
 
 }
