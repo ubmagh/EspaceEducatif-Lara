@@ -91,6 +91,8 @@ Route::prefix('Classes')->group(function () {
     Route::get('Comment','UserController@NewComment'); //// Commenter une publication
     Route::get('Like','UserController@Like');
     Route::get('GetClassesProf','UserController@GetClassProf');
+    Route::get('CheckDownload','UserController@CheckMedia');
+    Route::get('Download','UserController@GetMedia');
 }); 
 
 

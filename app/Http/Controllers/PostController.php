@@ -63,4 +63,12 @@ class PostController extends Controller
         return response($toret,200,['Content-Type' => 'application/json']) ;
     }
 
+    public function GetPosts_classeID($PostID){
+        $classe = post::find($PostID);
+        if(empty($classe))
+            return false;
+        return $classe->classId;
+    }
+    
+
 }

@@ -169,7 +169,7 @@ class UserController extends Controller
         }
 
         //// get full avatar url
-        $details[0]->AvatarPath = "http://localhost:8000/images/Avatars/" . $details[0]->AvatarPath;
+        
 
         return response()->json(['error' => 'none', 'user' => ['id' => $user->id, 'email' => $user->email, 'LastLogin' => $user->LastLogin, 'UserType' => $user->UserType], "details" => $details[0], 'LastLogDate' => '' . date('Y-d-m H:i:s')]);
     }
@@ -516,7 +516,7 @@ class UserController extends Controller
         $data = app('App\Http\Controllers\ClasseController')->GetClasseInfos( $ClasseID )[0];
         $Teacher= professeur::find($data->ProfID)->get()[0];
 
-        $data->ImagePath="http://localhost:8000/images/ClassesWalls/".$data->ImagePath;
+        $data->ImagePath="/images/ClassesWalls/".$data->ImagePath;
 
          return response()->json(['error' => 'none', 'data' => ['profName'=> $Teacher->Lname." ".$Teacher->Fname , "classeData" => $data ] ], 200, ['Content-Type' => 'application/json']);
     }
@@ -630,7 +630,7 @@ class UserController extends Controller
             $name=$etud->Lname." ".$etud->Fname;
             $pic=$etud->AvatarPath;
         }
-        $pic="http://localhost:8000/images/Avatars/".$pic;
+        $pic="/images/Avatars/".$pic;
         return ['name'=>$name,"type"=>$type,"id"=>$userID,"pic"=>$pic];
     }
 
@@ -719,7 +719,7 @@ class UserController extends Controller
         $Classe = app('App\Http\Controllers\ClasseController')->GetClasseInfos($request->classID)[0];
         $prof= professeur::find($Classe->ProfID);
         $useri = user::where('email',$prof->email)->first();
-        $tab=['id'=>$useri->id,'idProf'=>$prof->id,'name'=>$prof->Lname." ".$prof->Fname,'pic'=>"http://localhost:8000/images/Avatars/".$prof->AvatarPath];
+        $tab=['id'=>$useri->id,'idProf'=>$prof->id,'name'=>$prof->Lname." ".$prof->Fname,'pic'=>"/images/Avatars/".$prof->AvatarPath];
         $tmp =  app('App\Http\Controllers\ClasseController')->GetClassMates($request->classID);
         $the6=app('App\Http\Controllers\EtudiantController')->Get6ClasseMates($tmp['F'],$tmp['A']);
         return   response()->json(['status' => 'succeded',"content"=>$tab,'the6'=>$the6], 200, ['Content-Type' => 'application/json']);
@@ -752,7 +752,7 @@ class UserController extends Controller
             $created = str_split($user->CreatedAt,10);
             $toret = ['Joined'=>$created[0],'Type'=>'etud',"infos"=>$etud];
         }
-        $toret["infos"]->AvatarPath = "http://localhost:8000/images/Avatars/".$toret["infos"]->AvatarPath;
+        $toret["infos"]->AvatarPath = "/images/Avatars/".$toret["infos"]->AvatarPath;
         return response()->json(['status' => 'succeded',"content"=>$toret], 200, ['Content-Type' => 'application/json']);
     }
 
@@ -800,10 +800,10 @@ class UserController extends Controller
 
                     if($useri->UserType =="prof"){
                         $prof= professeur::where('email',$useri->email)->first();
-                        $data=[ 'Type'=>"prof", "name"=>$prof->Lname." ".$prof->Fname,'email'=>$prof->email, 'Filiere'=>$prof->Filiere, 'Sex'=>$prof->Sex, 'Matiere'=>$prof->Matiere,'pic'=>'http://localhost:8000/images/Avatars/'.$prof->AvatarPath ];
+                        $data=[ 'Type'=>"prof", "name"=>$prof->Lname." ".$prof->Fname,'email'=>$prof->email, 'Filiere'=>$prof->Filiere, 'Sex'=>$prof->Sex, 'Matiere'=>$prof->Matiere,'pic'=>'/images/Avatars/'.$prof->AvatarPath ];
                     }else if($useri->UserType =="etud"){
                         $etud= Etudiant::where('email',$useri->email)->first();
-                        $data=[ 'Type'=>"etud", "name"=>$etud->Lname." ".$etud->Fname,'email'=>$etud->email, 'Filiere'=>$etud->Filiere, 'Sex'=>$etud->Sex, 'Annee'=>$etud->Annee,'dateNai'=>$etud->dateNaissance ,'pic'=>'http://localhost:8000/images/Avatars/'.$etud->AvatarPath ];
+                        $data=[ 'Type'=>"etud", "name"=>$etud->Lname." ".$etud->Fname,'email'=>$etud->email, 'Filiere'=>$etud->Filiere, 'Sex'=>$etud->Sex, 'Annee'=>$etud->Annee,'dateNai'=>$etud->dateNaissance ,'pic'=>'/images/Avatars/'.$etud->AvatarPath ];
                     }
 
                     return response()->json(['status' => 'succeded',"content"=>$data], 200, ['Content-Type' => 'application/json']);
@@ -813,6 +813,86 @@ class UserController extends Controller
             return response()->json(['status' => 'succeded',"content"=>["Type"=>"notFound"]], 200, ['Content-Type' => 'application/json']);
     }
 
+
+    public function CheckMedia(Request $request){
+        try {
+            if (!$user = JWTAuth::parseToken()->authenticate()) {
+                return response()->json(['error' => 'userNotFound'], 200);
+            }
+        } catch (TokenExpiredException $e) {
+            return response()->json(["error" => 'token_expired'], 200);
+        } catch (TokenInvalidException $e) {
+            return response()->json(["error" => 'token_invalid'], 200);
+        } catch (JWTException $e) {
+            return response()->json(["error" => 'token_absent'], 200);
+        }
+
+        if($user->UserType=="prof"){
+
+            /// TODO
+
+        }else if($user->UserType=="etud"){
+
+            $etud = Etudiant::where('email',$user->email)->first();
+
+            $postID = app('App\Http\Controllers\MediaController')->GetMedias_PostID($request->MediaID);
+            
+            if( ! $postID)//// if Media function returns false
+            return response()->json(['status' => 'err',"content"=>"notFoundMedia"], 200, ['Content-Type' => 'application/json']);
+
+            $ClassID = app('App\Http\Controllers\PostController')->GetPosts_classeID($postID);
+            if ( !app('App\Http\Controllers\ClasseController')->checkEtudiantAccess($etud->Filiere,$etud->Annee,$ClassID) ){
+            return response()->json(['status' => 'Rejected',"content"=>"unauthorized"], 200, ['Content-Type' => 'application/json']);
+            }
+
+            return response()->json(['status' => 'Exist',"content"=>"succes"], 200, ['Content-Type' => 'application/json']);
+
+            
+
+        }
+
+    }
+
+
+    public function GetMedia(Request $request){
+
+        try {
+            if (!$user = JWTAuth::parseToken()->authenticate()) {
+                return response()->json(['error' => 'userNotFound'], 200);
+            }
+        } catch (TokenExpiredException $e) {
+            return response()->json(["error" => 'token_expired'], 200);
+        } catch (TokenInvalidException $e) {
+            return response()->json(["error" => 'token_invalid'], 200);
+        } catch (JWTException $e) {
+            return response()->json(["error" => 'token_absent'], 200);
+        }
+
+
+
+        if($user->UserType=="prof"){
+
+            /// TODO
+
+        }else if($user->UserType=="etud"){
+
+            $etud = Etudiant::where('email',$user->email)->first();
+
+            $postID = app('App\Http\Controllers\MediaController')->GetMedias_PostID($request->MediaID);
+            
+            if( ! $postID)//// if Media function returns false
+            return response()->json(['status' => 'err',"content"=>"notFoundMedia"], 200, ['Content-Type' => 'application/json']);
+
+            $ClassID = app('App\Http\Controllers\PostController')->GetPosts_classeID($postID);
+            if ( !app('App\Http\Controllers\ClasseController')->checkEtudiantAccess($etud->Filiere,$etud->Annee,$ClassID) ){
+            return response()->json(['status' => 'Rejected',"content"=>"unauthorized"], 200, ['Content-Type' => 'application/json']);
+            }
+
+            return app('App\Http\Controllers\MediaController')->DownloadLink($request->MediaID);
+        }
+    }
+
+    
 
 
 
