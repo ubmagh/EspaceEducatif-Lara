@@ -892,7 +892,71 @@ class UserController extends Controller
         }
     }
 
+
+    public function DashPosts(Request $request){
+
+        try {
+            if (!$user = JWTAuth::parseToken()->authenticate()) {
+                return response()->json(['error' => 'userNotFound'], 200);
+            }
+        } catch (TokenExpiredException $e) {
+            return response()->json(["error" => 'token_expired'], 200);
+        } catch (TokenInvalidException $e) {
+            return response()->json(["error" => 'token_invalid'], 200);
+        } catch (JWTException $e) {
+            return response()->json(["error" => 'token_absent'], 200);
+        }
+
+        /// validate access to class posts 
+        //// c'est une validation sur les apis non sur les classes allright then ?
+        if($user->UserType=="prof"){
+            $prof=professeur::where('email',$user->email)->get();
+            //// TODO
+
+        }else{
+            $student = Etudiant::where('email',$user->email)->First();
+            return app('App\Http\Controllers\PostController')->GetStud_DashPosts( $student->Annee, $student->Filiere, $user->id);   
+        }
+    }
     
+    public function DashPosts_MorePosts(Request $request){
+        try {
+            if (!$user = JWTAuth::parseToken()->authenticate()) {
+                return response()->json(['error' => 'userNotFound'], 200);
+            }
+        } catch (TokenExpiredException $e) {
+            return response()->json(["error" => 'token_expired'], 200);
+        } catch (TokenInvalidException $e) {
+            return response()->json(["error" => 'token_invalid'], 200);
+        } catch (JWTException $e) {
+            return response()->json(["error" => 'token_absent'], 200);
+        }
+
+        $offset = $request->Offset;
+
+        if(!ctype_digit($offset))
+        return response()->json(["error" => 'ParamMissing'], 200);
+
+
+        if($user->UserType=="prof"){
+            $prof=professeur::where('email',$user->email)->get();
+            //// TODO
+
+        }else{
+            $student = Etudiant::where('email',$user->email)->First();
+            return app('App\Http\Controllers\PostController')->GetStud_MorePosts( $student->Annee, $student->Filiere, $user->id,$offset);   
+        }
+
+    }
+
+
+    public function Posts_MorePosts(Request $request){
+
+
+
+        
+    }
+
 
 
 

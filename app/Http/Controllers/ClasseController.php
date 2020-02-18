@@ -66,4 +66,10 @@ class ClasseController extends Controller
         return ['F'=>$classe->Filiere,'A'=>$classe->Annee];
     }
 
+
+    public function GetClasse_Figured(string $ClassID){
+        $classe = classe::find($ClassID);
+        return ['id'=>$classe->id,'name'=>$classe->ClasseName];
+    }
+
 }

@@ -72,14 +72,14 @@ Route::prefix('Settings')->group(function () {
     Route::post('ChangePwD', 'UserController@ChangePwD'); ///changer le mot de passe
     Route::post('ChangeAva', 'UserController@ChangeAva'); ///changer l'image de profile
     Route::post('DefAvatar', 'UserController@DefAvatar'); /// image de profle par defaut
-
 });
 ///// End parametres Routes
 
 
 
 
-
+Route::get('DashPosts','UserController@DashPosts');
+Route::get('MorePosts','UserController@DashPosts_MorePosts');
 
 
 
@@ -88,6 +88,7 @@ Route::prefix('Settings')->group(function () {
 Route::prefix('Classes')->group(function () {
     Route::get('ClassInfo', 'UserController@GetClasseInfos'); ///changer l'email
     Route::get('Posts','UserController@Posts'); //// retournera les premiers postes a afficher 8 max aprés getMore va charger 4 par 4
+    Route::get('Posts','UserController@Posts_MorePosts'); //// retournera les premiers postes a afficher 8 max aprés getMore va charger 4 par 4
     Route::get('Comment','UserController@NewComment'); //// Commenter une publication
     Route::get('Like','UserController@Like');
     Route::get('GetClassesProf','UserController@GetClassProf');
