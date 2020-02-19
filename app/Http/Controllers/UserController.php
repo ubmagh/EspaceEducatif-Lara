@@ -952,12 +952,77 @@ class UserController extends Controller
 
     public function Posts_MorePosts(Request $request){
 
+        try {
+            if (!$user = JWTAuth::parseToken()->authenticate()) {
+                return response()->json(['error' => 'userNotFound'], 200);
+            }
+        } catch (TokenExpiredException $e) {
+            return response()->json(["error" => 'token_expired'], 200);
+        } catch (TokenInvalidException $e) {
+            return response()->json(["error" => 'token_invalid'], 200);
+        } catch (JWTException $e) {
+            return response()->json(["error" => 'token_absent'], 200);
+        }
 
+        $offset = $request->Offset;
+        $ClassID = $request->classID;
 
-        
+        if(!ctype_digit($offset) || !ctype_digit($ClassID))
+        return response()->json(["error" => 'ParamMissing'], 200);
+
+        if($user->UserType=="prof"){
+            $prof=professeur::where('email',$user->email)->get();
+            //// TODO
+
+        }else{
+            $student = Etudiant::where('email',$user->email)->First();
+            return app('App\Http\Controllers\PostController')->Class_More_Posts( $ClassID, $user->id,$offset);   
+        }
     }
 
 
+    public function ClasseMates(Request $request){
+
+        try {
+            if (!$user = JWTAuth::parseToken()->authenticate()) {
+                return response()->json(['error' => 'userNotFound'], 200);
+            }
+        } catch (TokenExpiredException $e) {
+            return response()->json(["error" => 'token_expired'], 200);
+        } catch (TokenInvalidException $e) {
+            return response()->json(["error" => 'token_invalid'], 200);
+        } catch (JWTException $e) {
+            return response()->json(["error" => 'token_absent'], 200);
+        }
+        $ClassID = $request->classID;
+        if( !ctype_digit($ClassID))
+        return response()->json(["error" => 'ParamMissing'], 200);
+
+
+        //// user id   +  name + avatar 
+        ////                                                       email
+        //// classID ---> Filiere  +  Année ---> Etudiants -----------------> users  
+        ////                                    name + avatar                 userID 
+
+        ////////   Vérify user Access to ClassMates infos  ?  /// i think its TODO :D
+
+        $ClassInfos = app('App\Http\Controllers\ClasseController')->GetClassMates($ClassID); //// ici j'ai la filiere et l'année de ce classe
+        
+        $ClassMates_Etudiant = app('App\Http\Controllers\EtudiantController')->Get_Etudiant_ClasseMates( $ClassInfos["F"] , $ClassInfos["A"] );
+
+        $ClassMates = [];
+        foreach($ClassMates_Etudiant as $etudiant){
+
+            $user = user::where('email',$etudiant->email)->first();
+            $cM = ['id' => $user->id, 'name'=>$etudiant->Fname." ".$etudiant->Lname, 'pic'=>$etudiant->AvatarPath  ];
+            array_push($ClassMates,$cM);
+        }
+
+        return response()->json(['status' => 'success',"content"=>$ClassMates], 200, ['Content-Type' => 'application/json']);
+
+
+
+    }
 
 
 }

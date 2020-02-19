@@ -88,12 +88,13 @@ Route::get('MorePosts','UserController@DashPosts_MorePosts');
 Route::prefix('Classes')->group(function () {
     Route::get('ClassInfo', 'UserController@GetClasseInfos'); ///changer l'email
     Route::get('Posts','UserController@Posts'); //// retournera les premiers postes a afficher 8 max aprés getMore va charger 4 par 4
-    Route::get('Posts','UserController@Posts_MorePosts'); //// retournera les premiers postes a afficher 8 max aprés getMore va charger 4 par 4
+    Route::get('MorePosts','UserController@Posts_MorePosts'); //// retournera les premiers postes a afficher 8 max aprés getMore va charger 4 par 4
     Route::get('Comment','UserController@NewComment'); //// Commenter une publication
     Route::get('Like','UserController@Like');
     Route::get('GetClassesProf','UserController@GetClassProf');
     Route::get('CheckDownload','UserController@CheckMedia');
     Route::get('Download','UserController@GetMedia');
+    Route::get('ClasseMates','UserController@ClasseMates');
 }); 
 
 
