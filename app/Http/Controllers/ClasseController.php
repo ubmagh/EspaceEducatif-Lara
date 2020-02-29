@@ -29,6 +29,13 @@ class ClasseController extends Controller
         return $data;
     }
 
+    public function GetClassesList_Stud(string $Filiere, string $Annee){
+        $data = classe::where('Filiere', $Filiere)->where('Annee', $Annee)->get();
+        foreach($data as $data__)
+        unset($data__->ImagePath);
+        return $data;
+    }
+
     public function GetClasseInfos(string $ClassID){
         $data = classe::where('id',$ClassID)->get();
         return $data;

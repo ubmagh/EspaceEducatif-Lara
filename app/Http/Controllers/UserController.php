@@ -10,6 +10,7 @@ use App\Etudiant;
 use App\professeur;
 use App\Permission;
 use App\post;
+use App\classe;
 use Exception;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
@@ -229,7 +230,12 @@ class UserController extends Controller
             if (empty($etud[0])) {
                 return response()->json(["error" => 'NotStudent']);
             }
-            $ret =  app('App\Http\Controllers\ClasseController')->GetInitialClassesStud($etud[0]->Filiere . '', $etud[0]->Annee . '');
+            $ret =  app('App\Http\Controllers\ClasseController')->GetClassesList_Stud($etud[0]->Filiere . '', $etud[0]->Annee . '');
+            foreach($ret as $classe){
+                $ClasseProf = professeur::find($classe->id);
+                $ClasseProf_User = user::where('email',$ClasseProf->email)->first();
+                $classe->ProfID=['name'=>$ClasseProf->Lname.' '.$ClasseProf->Fname,'id'=>$ClasseProf_User->id];
+            }
         } else {
             $prof = professeur::where('email', $user->email)->get();
             if (empty($prof[0])) {
@@ -540,24 +546,23 @@ class UserController extends Controller
         //// validation required ! before creating post into classe
         if($user->UserType=="prof"){
 
-            $prof=professeur::where('email',$user->email)->get();
-           if ( DB::select("select count(*) as num from classes where id=? and ProfID=?", [$request->classID,$prof->id])[0]->num ==0 )
+            $prof=professeur::where('email',$user->email)->first();
+           if ( ! app('App\Http\Controllers\ClasseController')->checkProfAccess($prof->id,$request->classID) )
            return   response()->json(['status' => 'NonAuth', 'content' => "Acces not permitted"], 200, ['Content-Type' => 'application/json']);
+           $postID = app('App\Http\Controllers\PostController')->CreatePoste_ReturnItsID($request->classID,$user->id,$request->pub,true);
 
         }else{
             
-            $student = Etudiant::where('email',$user->email)->First();
+            $student = Etudiant::where('email',$user->email)->first();
 
             ////Check posting permissions First !
             if( !app('App\Http\Controllers\PermissionController')->CheckEtud_PostingPer($student->id)  )
            return   response()->json(['status' => 'permission', 'content' => "Acces not permitted"], 200, ['Content-Type' => 'application/json']);
 
             
-            if ( DB::select("select Filiere+Annee as combi from classes where id=?", [$request->classID])[0]->combi != $student->Filiere.$student->Annee )
-           return   response()->json(['status' => 'NonAuth', 'content' => "Acces not permitted"], 200, ['Content-Type' => 'application/json']);
-        }
+           
         $postID = app('App\Http\Controllers\PostController')->CreatePoste_ReturnItsID($request->classID,$user->id,$request->pub,false);
-
+        }
 
 
         $lngth = $request->lngth;
@@ -577,7 +582,10 @@ class UserController extends Controller
             app('App\Http\Controllers\MediaController')->CreateMedia( $postID, $user->id, $extension, $Files[$i]->getClientOriginalName(), $path,$size );
         }
 
-        
+        if($user->UserType=="prof"){
+            $post = app('App\Http\Controllers\PostController')->Get_Post_ByID($postID);
+            return   response()->json(['status' => 'Succes', 'content' => $post], 200, ['Content-Type' => 'application/json']);
+        }
         return   response()->json(['status' => 'Succes', 'content' => "succeded"], 200, ['Content-Type' => 'application/json']);
         
 
@@ -600,7 +608,7 @@ class UserController extends Controller
         /// validate access to class posts 
         //// c'est une validation sur les apis non sur les classes allright then ?
         if($user->UserType=="prof"){
-            $prof=professeur::where('email',$user->email)->get();
+            $prof=professeur::where('email',$user->email)->first();
            if ( DB::select("select count(*) as num from classes where id=? and ProfID=?", [$request->classID,$prof->id])[0]->num ==0 )
            return   response()->json(['status' => 'NonAuth', 'content' => "Acces not permitted"], 200, ['Content-Type' => 'application/json']);
 
@@ -742,10 +750,11 @@ class UserController extends Controller
             return response()->json(["error" => 'token_absent'], 200);
         }
 
-        if( $user->Usertype == "prof" ){
+        if( $user->UserType == "prof" ){
 
-            ///// TOdo
             $prof = professeur::where('email',$user->email)->first();
+            $created = str_split($user->CreatedAt,10);
+            $toret = ['Joined'=>$created[0],'Type'=>'prof',"infos"=>$prof];
 
         }else{
             $etud = Etudiant::where('email',$user->email)->first();
@@ -829,7 +838,15 @@ class UserController extends Controller
 
         if($user->UserType=="prof"){
 
-            /// TODO
+            $prof = professeur::where('email',$user->email)->first();
+            $postID = app('App\Http\Controllers\MediaController')->GetMedias_PostID($request->MediaID);
+            
+            if( ! $postID)//// if Media function returns false
+            return response()->json(['status' => 'err',"content"=>"notFoundMedia"], 200, ['Content-Type' => 'application/json']);
+            $ClassID = app('App\Http\Controllers\PostController')->GetPosts_classeID($postID);
+            if ( !app('App\Http\Controllers\ClasseController')->checkProfAccess($prof->id,$ClassID) ){
+                return response()->json(['status' => 'Rejected',"content"=>"unauthorized"], 200, ['Content-Type' => 'application/json']);
+                }
 
         }else if($user->UserType=="etud"){
 
@@ -844,12 +861,8 @@ class UserController extends Controller
             if ( !app('App\Http\Controllers\ClasseController')->checkEtudiantAccess($etud->Filiere,$etud->Annee,$ClassID) ){
             return response()->json(['status' => 'Rejected',"content"=>"unauthorized"], 200, ['Content-Type' => 'application/json']);
             }
-
-            return response()->json(['status' => 'Exist',"content"=>"succes"], 200, ['Content-Type' => 'application/json']);
-
-            
-
         }
+        return response()->json(['status' => 'Exist',"content"=>"succes"], 200, ['Content-Type' => 'application/json']);
 
     }
 
@@ -868,28 +881,30 @@ class UserController extends Controller
             return response()->json(["error" => 'token_absent'], 200);
         }
 
+        $postID = app('App\Http\Controllers\MediaController')->GetMedias_PostID($request->MediaID);
+            
+        if( ! $postID)//// if Media function returns false
+        return response()->json(['status' => 'err',"content"=>"notFoundMedia"], 200, ['Content-Type' => 'application/json']);
+        $ClassID = app('App\Http\Controllers\PostController')->GetPosts_classeID($postID);
 
 
         if($user->UserType=="prof"){
 
-            /// TODO
+            $prof = professeur::where('email',$user->email)->first();
+            if ( !app('App\Http\Controllers\ClasseController')->checkProfAccess($prof->id,$ClassID) ){
+                return response()->json(['status' => 'Rejected',"content"=>"unauthorized"], 200, ['Content-Type' => 'application/json']);
+                }
 
         }else if($user->UserType=="etud"){
 
             $etud = Etudiant::where('email',$user->email)->first();
 
-            $postID = app('App\Http\Controllers\MediaController')->GetMedias_PostID($request->MediaID);
-            
-            if( ! $postID)//// if Media function returns false
-            return response()->json(['status' => 'err',"content"=>"notFoundMedia"], 200, ['Content-Type' => 'application/json']);
-
-            $ClassID = app('App\Http\Controllers\PostController')->GetPosts_classeID($postID);
             if ( !app('App\Http\Controllers\ClasseController')->checkEtudiantAccess($etud->Filiere,$etud->Annee,$ClassID) ){
             return response()->json(['status' => 'Rejected',"content"=>"unauthorized"], 200, ['Content-Type' => 'application/json']);
             }
-
-            return app('App\Http\Controllers\MediaController')->DownloadLink($request->MediaID);
         }
+        return app('App\Http\Controllers\MediaController')->DownloadLink($request->MediaID);
+
     }
 
 
@@ -910,8 +925,13 @@ class UserController extends Controller
         /// validate access to class posts 
         //// c'est une validation sur les apis non sur les classes allright then ?
         if($user->UserType=="prof"){
-            $prof=professeur::where('email',$user->email)->get();
-            //// TODO
+            $prof=professeur::where('email',$user->email)->first();
+            $classes = classe::where('ProfID',$prof->id)->get();
+            $classesIDS=[];
+            foreach($classes as $classe){
+                array_push($classesIDS,$classe->id);
+            }
+            return app('App\Http\Controllers\PostController')->GetProf_DashPosts($classesIDS,$user->id);   
 
         }else{
             $student = Etudiant::where('email',$user->email)->First();
@@ -938,9 +958,20 @@ class UserController extends Controller
         return response()->json(["error" => 'ParamMissing'], 200);
 
 
+        //// check users access to this data's
+
+
+
         if($user->UserType=="prof"){
-            $prof=professeur::where('email',$user->email)->get();
-            //// TODO
+            $prof=professeur::where('email',$user->email)->first();
+            $Classes= classe::where('ProfID',$prof->id)->get();
+            if(empty($Classes))
+            return ['status'=>'succes','Posts'=>[],'Posters'=>[],'Classes'=>[],'medias'=>[],'LastComms'=>[],'Likes'=>[]];
+            $Classes__IDS=[];
+            foreach($Classes as $classe){
+                array_push($Classes__IDS,$classe->id);
+            }
+            return app('App\Http\Controllers\PostController')->GetProf_MorePosts( $Classes__IDS , $user->id,$offset ); 
 
         }else{
             $student = Etudiant::where('email',$user->email)->First();
@@ -970,12 +1001,22 @@ class UserController extends Controller
         if(!ctype_digit($offset) || !ctype_digit($ClassID))
         return response()->json(["error" => 'ParamMissing'], 200);
 
+        ## Check on user if he has access to class's posts
+
+
         if($user->UserType=="prof"){
-            $prof=professeur::where('email',$user->email)->get();
-            //// TODO
+            $prof=professeur::where('email',$user->email)->first();
+
+            if( ! app('App\Http\Controllers\ClasseController')->checkProfAccess($prof->id,$ClassID) )
+            return response()->json(["error" => 'NotPermitted'], 200);
+
+            return app('App\Http\Controllers\PostController')->Class_More_Posts( $ClassID, $user->id,$offset);   
+            
 
         }else{
             $student = Etudiant::where('email',$user->email)->First();
+            if( ! app('App\Http\Controllers\ClasseController')->checkEtudiantAccess($student->Filiere,$student->Annee,$ClassID) )
+            return response()->json(["error" => 'NotPermitted'], 200);
             return app('App\Http\Controllers\PostController')->Class_More_Posts( $ClassID, $user->id,$offset);   
         }
     }
@@ -999,12 +1040,23 @@ class UserController extends Controller
         return response()->json(["error" => 'ParamMissing'], 200);
 
 
+
         //// user id   +  name + avatar 
         ////                                                       email
         //// classID ---> Filiere  +  Année ---> Etudiants -----------------> users  
         ////                                    name + avatar                 userID 
 
-        ////////   Vérify user Access to ClassMates infos  ?  /// i think its TODO :D
+        ////////   Vérify user Access to ClassMates infos  ?  /// i think its TO-(done)-DO :D
+        if($user->UserType=="prof"){
+            $prof=professeur::where('email',$user->email)->first();
+            if( ! app('App\Http\Controllers\ClasseController')->checkProfAccess($prof->id,$ClassID) )
+            return response()->json(["error" => 'Notpermitted'], 200);
+        }else{
+            $etud=Etudiant::where('email',$user->email)->first();
+            if( !app('App\Http\Controllers\ClasseController')->checkEtudiantAccess($etud->Filiere,$etud->Annee,$ClassID) )
+            return response()->json(["error" => 'Notpermitted'], 200);
+        }
+
 
         $ClassInfos = app('App\Http\Controllers\ClasseController')->GetClassMates($ClassID); //// ici j'ai la filiere et l'année de ce classe
         
