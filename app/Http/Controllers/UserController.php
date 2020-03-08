@@ -1072,7 +1072,41 @@ class UserController extends Controller
 
         return response()->json(['status' => 'success',"content"=>$ClassMates], 200, ['Content-Type' => 'application/json']);
 
+    }
 
+
+    public function ClasseCover(Request $request){
+
+        try {
+            if (!$user = JWTAuth::parseToken()->authenticate()) {
+                return response()->json(['error' => 'userNotFound'], 200);
+            }
+        } catch (TokenExpiredException $e) {
+            return response()->json(["error" => 'token_expired'], 200);
+        } catch (TokenInvalidException $e) {
+            return response()->json(["error" => 'token_invalid'], 200);
+        } catch (JWTException $e) {
+            return response()->json(["error" => 'token_absent'], 200);
+        }
+
+        $ClassID = $request->classiD;
+        if( !ctype_digit($ClassID))
+        return response()->json(["error" => 'ParamMissing'], 200);
+
+        if( $user->UserType=="etud"  )
+            return response()->json(["error" => 'Notpermitted'], 200);
+        $prof = professeur::where('email',$user->email)->first();
+        if( ! app('App\Http\Controllers\ClasseController')->checkProfAccess($prof->id,$ClassID) )
+            return response()->json(["error" => 'Notpermitted'], 200);
+
+        $file = $request->newcover;
+        
+        if(  !is_file($file) )
+        return response()->json(["error" => 'ParamMissing'], 200);
+        
+        $path= Storage::disk('TMP')->put('',$file);
+
+        return app('App\Http\Controllers\ClasseController')->Change_Cover($ClassID,$path);
 
     }
 

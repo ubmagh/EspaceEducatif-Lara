@@ -95,11 +95,11 @@ Route::prefix('Classes')->group(function () {
     Route::get('CheckDownload','UserController@CheckMedia');
     Route::get('Download','UserController@GetMedia');
     Route::get('ClasseMates','UserController@ClasseMates');
+    Route::post('ClasseCover','UserController@ClasseCover');
 }); 
 
 
 /////// End of Classes Routes
-
 
 
 

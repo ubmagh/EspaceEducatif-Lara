@@ -79,4 +79,21 @@ class ClasseController extends Controller
         return ['id'=>$classe->id,'name'=>$classe->ClasseName];
     }
 
+
+    public function Change_Cover($classID,$path){
+
+        rename(storage_path('app\Classes\TMP').'\\'.$path ,public_path('images\ClassesWalls').'\\'.$path) ;
+        $class = classe::find($classID);
+
+        if( $class->ImagePath !="def.jpg" ){
+            unlink( public_path('images\ClassesWalls').'\\'.$class->ImagePath );
+        }
+
+        $class->ImagePath = $path;
+        $class->save();
+
+        return response()->json(["error" => 'none'], 200);
+
+    }
+
 }
