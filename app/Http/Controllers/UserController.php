@@ -1111,4 +1111,178 @@ class UserController extends Controller
     }
 
 
+    public function Affichages(Request $request){
+
+        try {
+            if (!$user = JWTAuth::parseToken()->authenticate()) {
+                return response()->json(['error' => 'userNotFound'], 200);
+            }
+        } catch (TokenExpiredException $e) {
+            return response()->json(["error" => 'token_expired'], 200);
+        } catch (TokenInvalidException $e) {
+            return response()->json(["error" => 'token_invalid'], 200);
+        } catch (JWTException $e) {
+            return response()->json(["error" => 'token_absent'], 200);
+        }
+
+        $ClassID = $request->classiD;
+        if( !ctype_digit($ClassID))
+        return response()->json(["error" => 'ParamMissing'], 200);
+
+
+        if($user->UserType=="prof"){
+            $prof=professeur::where('email',$user->email)->first();
+            if( ! app('App\Http\Controllers\ClasseController')->checkProfAccess($prof->id,$ClassID) )
+            return response()->json(["error" => 'Notpermitted'], 200);
+        }else{
+            $etud=Etudiant::where('email',$user->email)->first();
+            if( !app('App\Http\Controllers\ClasseController')->checkEtudiantAccess($etud->Filiere,$etud->Annee,$ClassID) )
+            return response()->json(["error" => 'Notpermitted'], 200);
+        }
+        return app('App\Http\Controllers\AffichageController')->Getaffiches($ClassID);
+    }
+
+    public function NewAffichage(Request $request){
+
+         try {
+            if (!$user = JWTAuth::parseToken()->authenticate()) {
+                return response()->json(['error' => 'userNotFound'], 200);
+            }
+        } catch (TokenExpiredException $e) {
+            return response()->json(["error" => 'token_expired'], 200);
+        } catch (TokenInvalidException $e) {
+            return response()->json(["error" => 'token_invalid'], 200);
+        } catch (JWTException $e) {
+            return response()->json(["error" => 'token_absent'], 200);
+        }
+
+        $ClassID = $request->classiD;
+        if( !ctype_digit($ClassID) || empty($request->titre) || (strlen($request->titre)>60) || ( strlen($request->content)>150 && !empty($request->content) ) || ( $request->lngth!=0 && empty($request->lngth)) )
+        return response()->json(["error" => 'ParamMissing'], 200);
+        
+        if($user->UserType=="etud")
+        return response()->json(["error" => 'Notpermitted'], 200);
+
+        $prof=professeur::where('email',$user->email)->first();
+        if( ! app('App\Http\Controllers\ClasseController')->checkProfAccess($prof->id,$ClassID) )
+        return response()->json(["error" => 'Notpermitted'], 200);
+       
+        $files= [];
+        $lngth = $request->lngth;
+        $media= [];
+
+        if($lngth>0){
+            for($i=0;$i<$lngth;$i++){
+                array_push($files,$request->{"File".$i});
+            }
+            
+            foreach($files as $file){
+                $path= Storage::disk('TMP')->put('',$file);
+                $extension = mime_content_type( storage_path('app\Classes\TMP').'\\'.$path );
+                $size = $file->getSize();
+                array_push($media, app('App\Http\Controllers\MediaController')->CreateMedia( null, $user->id, $extension, $file->getClientOriginalName(), $path,$size) );
+            }
+        }
+        $content = trim($request->content);
+        if(empty($content))
+        $content = null;
+        return app('App\Http\Controllers\AffichageController')->newAffiche( $request->titre, $media, $content, $ClassID);
+    }
+
+    public function AffichageMedia(Request $request){
+
+        try {
+            if (!$user = JWTAuth::parseToken()->authenticate()) {
+                return response()->json(['error' => 'userNotFound'], 200);
+            }
+        } catch (TokenExpiredException $e) {
+            return response()->json(["error" => 'token_expired'], 200);
+        } catch (TokenInvalidException $e) {
+            return response()->json(["error" => 'token_invalid'], 200);
+        } catch (JWTException $e) {
+            return response()->json(["error" => 'token_absent'], 200);
+        }
+        
+        $mediaiD = $request->mediaiD;
+        $affID = $request->AffiD;
+        if( !ctype_digit($mediaiD) || !ctype_digit($affID) )
+        return response()->json(["error" => 'ParamMissing'], 200);
+
+        if( !app('App\Http\Controllers\AffichageController')->checkAffiche_media($affID,$mediaiD) )
+        return response()->json(["error" => 'ParamMissing'], 200);
+
+        return app('App\Http\Controllers\MediaController')->DownloadLink($mediaiD);
+    }
+
+
+    public function AffichageDel(Request $request){
+
+        try {
+            if (!$user = JWTAuth::parseToken()->authenticate()) {
+                return response()->json(['error' => 'userNotFound'], 200);
+            }
+        } catch (TokenExpiredException $e) {
+            return response()->json(["error" => 'token_expired'], 200);
+        } catch (TokenInvalidException $e) {
+            return response()->json(["error" => 'token_invalid'], 200);
+        } catch (JWTException $e) {
+            return response()->json(["error" => 'token_absent'], 200);
+        }
+
+        $affID = $request->AffiD;
+        if( !ctype_digit($affID) )
+        return response()->json(["error" => 'ParamMissing'], 200);
+
+        if($user->UserType=="etud")
+            return response()->json(["error" => 'Notpermitted'], 200);
+        
+        $prof=professeur::where('email',$user->email)->first();
+
+        $classID = app('App\Http\Controllers\AffichageController')->GetClassID($affID);
+
+        if(empty($classID))
+            return response()->json(["error" => 'NotFound'], 200);
+
+
+        if( ! app('App\Http\Controllers\ClasseController')->checkProfAccess($prof->id,$classID) )
+            return response()->json(["error" => 'Notpermitted'], 200);
+        
+        return app('App\Http\Controllers\AffichageController')->Delete($affID);
+    }
+
+    
+    public function QuickAffichages(Request $request){
+
+        try {
+            if (!$user = JWTAuth::parseToken()->authenticate()) {
+                return response()->json(['error' => 'userNotFound'], 200);
+            }
+        } catch (TokenExpiredException $e) {
+            return response()->json(["error" => 'token_expired'], 200);
+        } catch (TokenInvalidException $e) {
+            return response()->json(["error" => 'token_invalid'], 200);
+        } catch (JWTException $e) {
+            return response()->json(["error" => 'token_absent'], 200);
+        }
+
+        $classID = $request->classID;
+        if( !ctype_digit($classID) )
+            return response()->json(["error" => 'ParamMissing'], 200);
+
+            if($user->UserType=="prof"){
+                $prof=professeur::where('email',$user->email)->first();
+                if( ! app('App\Http\Controllers\ClasseController')->checkProfAccess($prof->id,$classID) )
+                return response()->json(["error" => 'Notpermitted'], 200);
+            }else{
+                $etud=Etudiant::where('email',$user->email)->first();
+                if( !app('App\Http\Controllers\ClasseController')->checkEtudiantAccess($etud->Filiere,$etud->Annee,$classID) )
+                return response()->json(["error" => 'Notpermitted'], 200);
+            }
+
+            return app('App\Http\Controllers\AffichageController')->Quick_Affichages($classID);
+
+    }
+
+
+
 }

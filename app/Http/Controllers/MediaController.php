@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Storage;
 class MediaController extends Controller
 {
     //
-    public function CreateMedia(string $PostID,string $PosterID, string $extension,string $orgName, string $PathName,string $size ){
+    public function CreateMedia( $PostID,string $PosterID, string $extension,string $orgName, string $PathName,string $size ){
         
         if( strstr($extension,"image") ){
             $type="image";
@@ -98,6 +98,7 @@ class MediaController extends Controller
                 'size'=>$size
             ]);
             $FstInsert = true;
+            return $media->id;
         } catch (Exception $exc) {
             return response()->json(['status' => 'DBError', 'content' => $exc . " creating media row"], 200, ['Content-Type' => 'application/json']);
         }
@@ -117,6 +118,17 @@ class MediaController extends Controller
         if(empty($media))
             return false;
         return $media->PostID;
+    }
+
+    public function GetMedia(string $mediaID){
+        $media = media::find($mediaID);
+        if(empty($media))
+            return null;
+        unset($media->PosterID);
+        unset( $media->date );
+        unset($media->path);
+        unset ($media->PostID);
+        return $media;
     }
 
     public function DownloadLink(string $MediaID){

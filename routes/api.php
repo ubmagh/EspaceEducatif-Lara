@@ -96,6 +96,11 @@ Route::prefix('Classes')->group(function () {
     Route::get('Download','UserController@GetMedia');
     Route::get('ClasseMates','UserController@ClasseMates');
     Route::post('ClasseCover','UserController@ClasseCover');
+    Route::get('affichages','UserController@Affichages');
+    Route::post('NewAffichage','UserController@NewAffichage');
+    Route::get('Affichage_Media','UserController@AffichageMedia');
+    Route::get('DelAffichage','UserController@AffichageDel');
+    Route::get('QuickAffichages','UserController@QuickAffichages');
 }); 
 
 

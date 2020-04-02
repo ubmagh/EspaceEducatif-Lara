@@ -19,7 +19,7 @@ class CreatePostsTable extends Migration
             $table->timestamp('date');
             $table->longText('Text');
             $table->bigInteger('userId');
-            $table->boolean('Approuved')->default('false');
+            $table->boolean('Approuved')->default('false')->nullable();
 
             $table->foreign('classId')->references('id')->on('classes');
             $table->foreign('userId')->references('id')->on('users')->onDelete('cascade');
