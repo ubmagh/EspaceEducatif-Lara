@@ -71,7 +71,7 @@ class PostController extends Controller
     }
     
     public function GetStud_DashPosts(string $Annee,string $Filiere,string $CurrentUserID){
-        $posts = DB::select( "select top 10 * from posts where classId in (select id from classes where Filiere='".$Filiere."' and Annee='".$Annee."' ) order by date desc");
+        $posts = DB::select( "select top 10 * from posts where classId in (select id from classes where Filiere='".$Filiere."' and Annee='".$Annee."' ) and Approuved=1 order by date desc");
         $Posts=[];
         $Posters=[];
         $medias=[];
@@ -117,7 +117,7 @@ class PostController extends Controller
         //// 10 publication se chargent 
         //// après si l'utilisateur demande plus 
         //// cette fonction charge 5 publication après skipping les 10 + 5*demmandés avant .
-        $posts = DB::select( "select * from posts where classId in (select id from classes where Filiere='".$Filiere."' and Annee='".$Annee."' ) order by date desc offset ".$toSkip." rows fetch next 5 rows only ");
+        $posts = DB::select( "select * from posts where classId in (select id from classes where Filiere='".$Filiere."' and Annee='".$Annee."' ) and Approuved=1 order by date desc offset ".$toSkip." rows fetch next 5 rows only ");
         
         if(empty($posts))
         return ['status'=>'succes','Posts'=>[],'Posters'=>[],'Classes'=>[],'medias'=>[],'LastComms'=>[],'Likes'=>[]];
