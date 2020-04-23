@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 
-////models
+/// models
 use App\User;
 use App\Etudiant;
 use App\professeur;
@@ -34,6 +34,94 @@ use Tymon\JWTAuth\Exceptions\TokenExpiredException;
 class UserController extends Controller
 {
     //
+
+
+
+    //////// Omar admin functions here 
+
+
+    public function listeUser()
+    { 
+        //first strep:: njibo data model
+        $user = User::all();
+        return view('homeAdmin.users')->with('user',$user);
+    }
+    
+    public function listeUser_edit(Request $request, $id)
+    { 
+        //editing
+        $user =User::findOrFail($id);
+        return view ('homeAdmin.users_edit')->with('user',$user);
+    }
+
+    public function listeUser_modifier(Request $request, $id)
+    { 
+        //editing
+        $user =User::find($id);    
+        $user->email = $request->input('email');
+        $user->UserType = $request->input('type');
+        $user->Activated = $request->input('activation');
+        $user->update();
+        return redirect('/liste-utilisateur')->with('status','Modification Faite');
+    }
+
+    public function user_professeur_insert(Request $request)
+    {
+        // hna ra la3b ela une formulaire walaqin b 2 table 
+     $users=new User;
+     $users->email=$request->input('email');
+     $users->password=Hash::make($request->input('password'));
+    $users->Activated='1';
+    $users->UserType='prof';
+    $users->CreatedAt=''.date('Y-d-m H:i:s');
+    
+
+
+
+
+
+
+     $prof=new professeur;
+     $prof->Fname=$request->input('nom');
+     $prof->Lname=$request->input('prenom');
+      $prof->email=$request->input('email');
+     
+     $prof->Filiere=$request->input('filiere');
+     $prof->Sex=$request->input('sex');
+     $prof->Matiere=$request->input('matiere');
+
+     if($request->input('sex')=="M")
+     $prof->AvatarPath="DefTM.png";
+     else
+     $prof->AvatarPath="DefTF.png";
+     
+    //  if($request->hasFile('image'))
+    //  {
+    //      $file=$request->file('image');
+    //      $extension=$file->getClientOriginalExtension();
+    //      $filename=time() . '.' .$extension;
+    //      $file->move('uploads/professeur/', $filename);
+    //      $prof->AvatarPath=$filename;
+    //  }
+    //  else
+    //  {
+    //     return "qsdqqsdqsdsq";
+    //     $prof->AvatarPath='';
+    //  }
+      $users->save();
+      $prof->save();
+
+
+     return redirect('/liste-utilisateur')->with('success','Data added for');
+    }
+
+
+    /// / /// end of omar functions
+
+
+
+
+
 
 
 

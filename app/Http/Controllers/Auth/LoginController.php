@@ -3,8 +3,10 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
 use App\Providers\RouteServiceProvider;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
+use Illuminate\Http\Request;
 
 class LoginController extends Controller
 {
@@ -26,7 +28,25 @@ class LoginController extends Controller
      *
      * @var string
      */
-    protected $redirectTo = RouteServiceProvider::HOME;
+    // protected $redirectTo = RouteServiceProvider::HOME;
+
+
+     
+    protected function redirectTo()
+    {
+
+        // $tmp = Auth::guard('api')->user();
+        // print_r($tmp);
+        // exit;
+
+        if(Auth::user()->UserType == 'admin')
+          return 'dachboard';
+        else{
+            Auth::logout();
+            return '/';
+        }
+
+    }
 
     /**
      * Create a new controller instance.
@@ -37,4 +57,11 @@ class LoginController extends Controller
     {
         $this->middleware('guest')->except('logout');
     }
+
+    public function showLoginForm(Request $request){
+        if( Auth::check() && (Auth::user()->UserType == 'admin') )
+            return redirect('/home');
+        return view('loginAdmin.login');
+    }
+
 }
