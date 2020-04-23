@@ -177,9 +177,9 @@
                         {{-- ($row->Activated)?"active":"desactive"      --}}
                         <td>                         
                          @if($row->Activated == true) 
-                              <span class="label label-primary"> Activé </span>    
+                              <span class="label text-success"> Activé </span>    
                          @else 
-                              <span class="label label-danger"> Désactivé </span>  
+                              <span class="label text-danger"> Désactivé </span>  
                          @endif
                         </td>                  
                         

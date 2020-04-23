@@ -32,9 +32,9 @@ class CreateEtudiantsTable extends Migration
 
         DB::table('etudiants')->insert(
             array(
-                'Fname' => 'Ayoub',
-                'Lname'=>'Maghdaoui',
-                'email' => 'ubmagh@gmail.com',
+                'Fname' => 'ed',
+                'Lname'=>'scoma',
+                'email' => 'etudiant1@localhost.com',
                 'dateNaissance'=>'2000-07-17',
                 'Sex'=>'M',
                 'Filiere'=>'GI',

@@ -26,7 +26,7 @@ class CreateUsersTable extends Migration
 
         DB::table('users')->insert(
             array(
-                'email' => 'ubmagh@gmail.com',
+                'email' => 'etudiant1@localhost.com',
                 'password' => '$2y$10$HVeWX4ufmCL5chB1VQXTeeAg7QfklO3thHrKRw5vn0zPjqhPkHbMa',
                 'LastLogin'=>null,
                 'CreatedAt'=>'2020/01/02',
@@ -39,11 +39,22 @@ class CreateUsersTable extends Migration
 
         DB::table('users')->insert(
             array(
-                'email' => 'ubmagh2@gmail.com',
+                'email' => 'professeur1@gmail.com',
                 'password' => '$2y$10$HVeWX4ufmCL5chB1VQXTeeAg7QfklO3thHrKRw5vn0zPjqhPkHbMa',
                 'LastLogin'=>null,
                 'CreatedAt'=>'2020/01/02',
                 'UserType'=>'prof',
+                'Activated'=>'1'
+            )
+        );
+
+        DB::table('users')->insert(
+            array(
+                'email' => 'admin@localhost.com',
+                'password' => '$2y$10$HVeWX4ufmCL5chB1VQXTeeAg7QfklO3thHrKRw5vn0zPjqhPkHbMa',
+                'LastLogin'=>null,
+                'CreatedAt'=>'2020/01/02',
+                'UserType'=>'admin',
                 'Activated'=>'1'
             )
         );

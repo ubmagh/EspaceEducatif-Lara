@@ -53,7 +53,7 @@
                         <td>{{ $row->Matiere }}</td>
                         
                         <td>
-                            <a href="/listeEtudiant-edit/{{ $row->id }}" class="btn btn success">EDIT</a>
+                            <a href="/listeProfesseur-edit/{{ $row->id }}" class="btn btn success">EDIT</a>
                         </td>
                         <td>
                           <form action="/listeEtudiant-delete/{{$row->id }}" method="POST">
