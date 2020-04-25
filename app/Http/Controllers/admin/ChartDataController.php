@@ -5,14 +5,26 @@ namespace App\Http\Controllers\admin;
 use App\post;
 use DateTime;
 use Illuminate\Http\Request;
+use App\Etudiant;
+use App\professeur;
 use App\Http\Controllers\Controller;
+use App\User;
 
 class ChartDataController extends Controller
 {
       
 
       function index(){
-          return view('homeAdmin.dachboard');
+            $users = User::where('Activated','=','0')->where('UserType', '!=', 'admin')->skip(0)->take(10)->orderby('CreatedAt')->get();
+            foreach($users as $user){
+                if($user->UserType=="prof")
+                    $tmp = professeur::where('email',$user->email)->first();
+                else if($user->UserType=="etud")
+                    $tmp = Etudiant::where('email',$user->email)->first();
+    
+                $user->nom = $tmp->Lname.' '.$tmp->Fname;
+            }
+            return view('homeAdmin.dachboard')->with('users',$users);
       } 
 
                 

@@ -172,8 +172,15 @@
                     <tr>
                         <td>{{ $row->id }}</td>
                         <td>{{ $row->email }}</td>
-                        <td>{{ $row->LastLogin }}</td>
-                        <td>{{ $row->UserType }}</td>
+                        <td>{{ substr($row->LastLogin,0,19) }}</td>
+                        <td>
+
+                          @if( $row->UserType =="prof" )
+                            Professeur
+                          @else
+                            Etudiant
+                          @endif
+                        </td>
                         {{-- ($row->Activated)?"active":"desactive"      --}}
                         <td>                         
                          @if($row->Activated == true) 

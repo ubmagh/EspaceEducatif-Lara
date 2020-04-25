@@ -47,9 +47,13 @@ class UserController extends Controller
     public function listeUser()
     { 
         //first strep:: njibo data model
-        $user = User::where('UserType', '=', 'etud')->orWhere('UserType', '=', 'prof')->get();
-        return view('homeAdmin.users')->with('user',$user);
+        $users = User::where('UserType', '=', 'etud')->orWhere('UserType', '=', 'prof')->get();
+        
+        return view('homeAdmin.users')->with('users',$users);
+        
     }
+
+  
     
     public function listeUser_edit(Request $request, $id)
     { 

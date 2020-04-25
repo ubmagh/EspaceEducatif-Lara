@@ -193,97 +193,47 @@
     <div class="col-md-6">
       <div class="card">
         <div class="card-header">
-          <h5 class="card-category">All Persons List</h5>
-          <h4 class="card-title"> Employees Stats</h4>
+          
+        <h4 class="card-title"> Utilisateurs non Activés </h4>
         </div>
         <div class="card-body">
           <div class="table-responsive">
             <table class="table">
               <thead class=" text-primary">
                 <th>
-                  Name
+                  Nom 
                 </th>
                 <th>
-                  Country
+                  Type
                 </th>
                 <th>
-                  City
+                  Créé le 
                 </th>
-                <th class="text-right">
-                  Salary
+                <th >
+                  Email
                 </th>
               </thead>
               <tbody>
-                <tr>
-                  <td>
-                    Dakota Rice
-                  </td>
-                  <td>
-                    Niger
-                  </td>
-                  <td>
-                    Oud-Turnhout
-                  </td>
-                  <td class="text-right">
-                    $36,738
-                  </td>
-                </tr>
-                <tr>
-                  <td>
-                    Minerva Hooper
-                  </td>
-                  <td>
-                    Curaçao
-                  </td>
-                  <td>
-                    Sinaai-Waas
-                  </td>
-                  <td class="text-right">
-                    $23,789
-                  </td>
-                </tr>
-                <tr>
-                  <td>
-                    Sage Rodriguez
-                  </td>
-                  <td>
-                    Netherlands
-                  </td>
-                  <td>
-                    Baileux
-                  </td>
-                  <td class="text-right">
-                    $56,142
-                  </td>
-                </tr>
-                <tr>
-                  <td>
-                    Doris Greene
-                  </td>
-                  <td>
-                    Malawi
-                  </td>
-                  <td>
-                    Feldkirchen in Kärnten
-                  </td>
-                  <td class="text-right">
-                    $63,542
-                  </td>
-                </tr>
-                <tr>
-                  <td>
-                    Mason Porter
-                  </td>
-                  <td>
-                    Chile
-                  </td>
-                  <td>
-                    Gloucester
-                  </td>
-                  <td class="text-right">
-                    $78,615
-                  </td>
-                </tr>
+                @foreach ($users as $user)
+                  <tr>
+                    <td>
+                      {{ $user->nom }}
+                    </td>
+                    <td>
+                      @if( $user->UserType =="prof")
+                        Professeur
+                      @else 
+                        Etudiant
+                      @endif
+                    </td>
+                    <td>
+                      {{ substr($user->CreatedAt,0,19) }}
+                    </td>
+                    <td>
+                      {{ $user->email }}
+                    </td>
+                  </tr>
+                @endforeach
               </tbody>
             </table>
           </div>

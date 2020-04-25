@@ -32,7 +32,7 @@ class CreateProfesseursTable extends Migration
             array(
                 'Fname' => 'Omar',
                 'Lname'=>'Zemzami',
-                'email' => 'ubmagh2@gmail.com',
+                'email' => 'professeur1@gmail.com',
                 'Filiere'=>'GI',
                 'Sex'=>'M',
                 'Matiere'=>'Mathématiques',
