@@ -12,7 +12,7 @@ return [
     | any other location as required by the application or its packages.
     |
     */
-
+    'REACT_URL'=>env('REACT_URL','url non définnie sur .env -> React_URL'),
     'name' => env('APP_NAME', 'Laravel'),
 
     /*

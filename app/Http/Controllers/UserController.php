@@ -25,6 +25,10 @@ use Tymon\JWTAuth\Contracts\JWTSubject;
 use Tymon\JWTAuth\PayloadFactory;
 use Tymon\JWTAuth\JWTManager as JWT;
 
+// mail 
+use App\Mail\compteActive;
+use Illuminate\Support\Facades\Mail;
+
 // use jwt exceptions ici
 use Tymon\JWTAuth\Exceptions\JWTException;
 use Tymon\JWTAuth\Exceptions\TokenInvalidException;
@@ -43,7 +47,7 @@ class UserController extends Controller
     public function listeUser()
     { 
         //first strep:: njibo data model
-        $user = User::all();
+        $user = User::where('UserType', '=', 'etud')->orWhere('UserType', '=', 'prof')->get();
         return view('homeAdmin.users')->with('user',$user);
     }
     
@@ -62,6 +66,10 @@ class UserController extends Controller
         $user->UserType = $request->input('type');
         $user->Activated = $request->input('activation');
         $user->update();
+        $url = config('app.REACT_URL'); /// obtenir le lien du plateform Prof/Etudiant
+        
+        if($user->Activated)
+        Mail::to($user->email)->send( new compteActive($url) );
         return redirect('/liste-utilisateur')->with('status','Modification Faite');
     }
 
