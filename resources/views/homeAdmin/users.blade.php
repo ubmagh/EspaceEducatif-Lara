@@ -168,7 +168,7 @@
                 </thead>
 
                 <tbody>
-                  @foreach ($user as $row)               
+                  @foreach ($users as $row)               
                     <tr>
                         <td>{{ $row->id }}</td>
                         <td>{{ $row->email }}</td>

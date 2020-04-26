@@ -1385,4 +1385,67 @@ class UserController extends Controller
 
 
 
+    public function InnaprouvedPosts(Request $request){
+
+        try {
+            if (!$user = JWTAuth::parseToken()->authenticate()) {
+                return response()->json(['error' => 'userNotFound'], 200);
+            }
+        } catch (TokenExpiredException $e) {
+            return response()->json(["error" => 'token_expired'], 200);
+        } catch (TokenInvalidException $e) {
+            return response()->json(["error" => 'token_invalid'], 200);
+        } catch (JWTException $e) {
+            return response()->json(["error" => 'token_absent'], 200);
+        }
+
+        $classID = $request->classID;
+        if( !ctype_digit($classID) )
+            return response()->json(["status" => 'ParamMissing'], 200);
+        
+        if($user->UserType!="prof")
+            return response()->json(["status" => 'Notpermitted'], 200);
+
+        $prof=professeur::where('email',$user->email)->first();
+        if( ! app('App\Http\Controllers\ClasseController')->checkProfAccess($prof->id,$classID) )
+            return response()->json(["status" => 'Notpermitted'], 200);
+
+        return app('App\Http\Controllers\PostController')->Get_innaprouved_Posts($classID);  
+
+    }
+
+
+    public function ApprouvePost(Request $request){
+        
+        try {
+            if (!$user = JWTAuth::parseToken()->authenticate()) {
+                return response()->json(['error' => 'userNotFound'], 200);
+            }
+        } catch (TokenExpiredException $e) {
+            return response()->json(["error" => 'token_expired'], 200);
+        } catch (TokenInvalidException $e) {
+            return response()->json(["error" => 'token_invalid'], 200);
+        } catch (JWTException $e) {
+            return response()->json(["error" => 'token_absent'], 200);
+        }
+
+        $postID = $request->postID;
+        $classID = $request->classID;
+        $approuve_delete = $request->approuve ? true:false;
+
+        if( !ctype_digit($postID) || !ctype_digit($classID) )
+            return response()->json(["status" => 'ParamMissing'], 200);
+        
+        if($user->UserType!="prof")
+            return response()->json(["status" => 'Notpermitted'], 200);
+        $prof=professeur::where('email',$user->email)->first();
+
+        if( ! app('App\Http\Controllers\ClasseController')->checkProfAccess($prof->id,$classID) )
+            return response()->json(["status" => 'Notpermitted'], 200);
+
+        return app('App\Http\Controllers\PostController')->approuve_Delete($classID,$postID,$approuve_delete);  
+    }
+
+
+
 }

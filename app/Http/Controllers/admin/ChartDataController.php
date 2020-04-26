@@ -19,8 +19,12 @@ class ChartDataController extends Controller
             foreach($users as $user){
                 if($user->UserType=="prof")
                     $tmp = professeur::where('email',$user->email)->first();
+
+                    
                 else if($user->UserType=="etud")
-                    $tmp = Etudiant::where('email',$user->email)->first();
+                    {$tmp = Etudiant::where('email',$user->email)->first();
+                }
+                    
     
                 $user->nom = $tmp->Lname.' '.$tmp->Fname;
             }

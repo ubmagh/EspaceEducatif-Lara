@@ -19,7 +19,7 @@ class PostController extends Controller
                 'userId' => $userID,
                 'date'=>'' . date('Y-d-m H:i:s'),
                 'Text' => trim(strip_tags($text)),
-                'Approuved' => $approuved ? '1':'0',
+                'Approuved' => $approuved ? '1':null,
             ]);
         } catch (Exception $exc) {
             return response()->json(['error' => 'PostErr', 'content' => $exc ], 200, ['Content-Type' => 'application/json']); 
@@ -290,5 +290,46 @@ class PostController extends Controller
         
     }
 
+
+
+    public function Get_innaprouved_Posts($classID){
+
+        $posts = DB::select('select * from posts where classId = '.$classID.' and Approuved is Null order by date desc ');
+
+        $Posts=[];
+        $Posters=[];
+        $medias=[];
+        
+        foreach($posts as $tmp){
+      
+            
+
+        $post = ['PostID'=>$tmp->id,'date'=>$tmp->date,'text'=>$tmp->Text,'likes'=> app('App\Http\Controllers\LikeController')->NumLikes($tmp->id),"Comments"=>app('App\Http\Controllers\CommentController')->NumComments($tmp->id) ] ;
+        array_push($Posts,$post);
+        $user = app('App\Http\Controllers\UserController')->PosterInfos($tmp->userId);
+        array_push($Posters,$user);
+        $media = app('App\Http\Controllers\MediaController')->PostMediasGet($tmp->id);
+        array_push($medias,$media);
+
+        }
+        
+    
+        $toret=['status'=>'succes','Posts'=>$Posts,'Posters'=>$Posters,'medias'=>$medias]; /// filed with for loop 
+        return response($toret,200,['Content-Type' => 'application/json']) ;
+
+    }
+
+
+    public function approuve_Delete($classID,$postID,$approuve_delete){
+        $post = post::where('classId',$classID)->where('id',$postID)->first();
+        if(empty($post))
+            return response()->json(["status" => 'Notpermitted'], 200);
+        
+        $post->Approuved = ($approuve_delete ? 1:0);
+
+        $post->save();
+        return response()->json(["status" => 'success'], 200);
+
+    }
 
 }

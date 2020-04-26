@@ -101,6 +101,8 @@ Route::prefix('Classes')->group(function () {
     Route::get('Affichage_Media','UserController@AffichageMedia');
     Route::get('DelAffichage','UserController@AffichageDel');
     Route::get('QuickAffichages','UserController@QuickAffichages');
+    Route::get('InnaPosts','UserController@InnaprouvedPosts');
+    Route::get('PostApprouve','UserController@ApprouvePost');
 }); 
 
 
