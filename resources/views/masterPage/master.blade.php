@@ -24,6 +24,7 @@
 
   {{-- hadi ztha ela wd recherche --}}
   <link rel="stylesheet" href="{{ asset('assets/css/dataTables.min.css')}}">
+
 </head>
 
 <body class="">
@@ -31,18 +32,18 @@
 
     <div class="sidebar" data-color="blue"><!--Tip 1: You can change the color of the sidebar using: data-color="blue | green | orange | red | yellow"-->
       <div class="logo">
-        <a href="http://www.esta.ac.ma/" class="simple-text logo-mini">
-        EST
+        <a href="{{ url('/dac hboard') }}" class="simple-text logo-mini d-block w-100 h2 text-center mt-3 mb-0">
+          {{ config('app.name')}}
         </a>
-        <a href="http://www.esta.ac.ma/" class="simple-text logo-normal">
-          Agadir
+        <a href="{{ url('/dac hboard') }}" class="simple-text logo-mini d-block w-100 mt-n3 mb-0 ">
+          {{ "Espace Administratif" }}
         </a>
       </div>
       <div class="sidebar-wrapper" id="sidebar-wrapper">
         <ul class="nav">
           <li class="{{ 'dachboard' == request()->path() ? 'active' : '' }}">
             <a href="/dachboard">
-              <i class="now-ui-icons design_app"></i>
+              <i class="fas fa-home"></i>
               <p>Dashboard</p>
             </a>
           </li>
@@ -59,41 +60,36 @@
             </a>
           </li> --}}
           <li>
-            <a href="./notifications.html">
-              <i class="now-ui-icons ui-1_bell-53"></i>
-              <p>Notifications</p>
+          <a href="{{ url('/Messages') }}">
+              <i class="fas fa-envelope"></i>
+              <p>Messages</p>
             </a>
           </li>
           <li class="{{ 'liste-professeur' == request()->path() ? 'active' : ''}}">
             <a href="/liste-professeur">
-              <i class="now-ui-icons business_briefcase-24"></i>
-              <p>Espace Professeurs</p>
+              <i class="fas fa-chalkboard-teacher"></i>
+              <p>Gérer les Professeurs</p>
             </a>
           </li>
           <li class="{{ 'liste-etudiant' == request()->path() ? 'active' : ''}}">
             <a href="/liste-etudiant">
-              <i class="now-ui-icons users_single-02"></i>
-              <p>Espace Etudiant</p>
+              <i class="fas fa-user-graduate"></i>
+              <p>Gérer les Etudiants </p>
             </a>
           </li>
           <li class="{{ 'liste-utilisateur' == request()->path() ? 'active' : ''}}">
             <a href="/liste-utilisateur">
-              <i class="now-ui-icons design_bullet-list-67"></i>
-              <p>Utilisateurs</p>
+              <i class="fas fa-users"></i>
+              <p>Gérer Les Utilisateurs</p>
             </a>
           </li>
           <li>
-            <a href="./typography.html">
-              <i class="now-ui-icons text_caps-small"></i>
-              <p>Typography</p>
+            <a href="{{ url('/Classes') }}">
+              <i class="fas fa-th-list"></i>
+              <p>Gérer Les Classes</p>
             </a>
           </li>
-          <li class="active-pro">
-            <a href="./upgrade.html">
-              <i class="now-ui-icons arrows-1_cloud-download-93"></i>
-              <p>Upgrade to PRO</p>
-            </a>
-          </li>
+         
         </ul>
       </div>
     </div>
@@ -119,29 +115,12 @@
             <span class="navbar-toggler-bar navbar-kebab"></span>
           </button>
           <div class="collapse navbar-collapse justify-content-end" id="navigation">
-            <form>
-              <div class="input-group no-border">
-                <input type="text" value="" class="form-control" placeholder="Search...">
-                <div class="input-group-append">
-                  <div class="input-group-text">
-                    <i class="now-ui-icons ui-1_zoom-bold"></i>
-                  </div>
-                </div>
-              </div>
-            </form>
+            
             <ul class="navbar-nav">
-              <li class="nav-item">
-                <a class="nav-link" href="#pablo">
-                  <i class="now-ui-icons media-2_sound-wave"></i>
-                  <p>
-                    <span class="d-lg-none d-md-block">Stats</span>
-                  </p>
-                </a>
-              </li>
-                 
+             
               <li class="nav-item dropdown">
                 <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
-                    {{ Auth::user()->UserType }} <span class="caret"></span>
+                    {{ Auth::user()->UserType }} 
                 </a>
 
                 <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
@@ -171,10 +150,10 @@
                 </div>
               </li> --}}
               <li class="nav-item">
-                <a class="nav-link" href="#pablo">
+              <a class="nav-link" href="{{ url('/Settings') }}">
                   <i class="now-ui-icons users_single-02"></i>
                   <p>
-                    <span class="d-lg-none d-md-block">Account</span>
+                    <span class="d-lg-none d-md-block">Paramètres</span>
                   </p>
                 </a>
               </li>
@@ -221,7 +200,7 @@
           <div class="copyright" id="copyright">
             &copy; <script>
               document.getElementById('copyright').appendChild(document.createTextNode(new Date().getFullYear()))
-            </script>, Designed by <a href="https://www.invisionapp.com" target="_blank">Invision</a>. Coded by <a href="https://www.creative-tim.com" target="_blank">Creative Tim</a>.
+            </script>, Espace Administratif. {{ config('app.name') }}
           </div>
         </div>
       </footer>

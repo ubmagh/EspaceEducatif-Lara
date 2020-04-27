@@ -34,13 +34,11 @@ class LoginController extends Controller
      
     protected function redirectTo()
     {
-
-        // $tmp = Auth::guard('api')->user();
-        // print_r($tmp);
-        // exit;
-
-        if(Auth::user()->UserType == 'admin')
+        
+        if(Auth::user()->UserType == 'admin'){
+            
           return 'dachboard';
+        }
         else{
             Auth::logout();
             return '/';

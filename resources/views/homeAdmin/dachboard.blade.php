@@ -3,14 +3,15 @@
 
 
 @section('title')
-    Dachboard | Admin
+    Dashboard | Admin
 @endsection
 
 
 
 
 @section('content')
-<div class="panel-header panel-header-lg">
+<div class="panel-header panel-header-lg py-5">
+  <h2 class="h2 text-light mb-1 text-center mt-n3"> publications par mois </h2>
   
   <canvas id="bigDashboardChart"></canvas>
 </div>
@@ -23,26 +24,16 @@
     <div class="col-lg-4">
       <div class="card card-chart">
         <div class="card-header">
-          <h5 class="card-category">Global Sales</h5>
-          <h4 class="card-title">Shipped Products</h4>
-          <div class="dropdown">
-            <button type="button" class="btn btn-round btn-outline-default dropdown-toggle btn-simple btn-icon no-caret" data-toggle="dropdown">
-              <i class="now-ui-icons loader_gear"></i>
-            </button>
-            <div class="dropdown-menu dropdown-menu-right">
-              <a class="dropdown-item" href="#">Action</a>
-              <a class="dropdown-item" href="#">Another action</a>
-              <a class="dropdown-item" href="#">Something else here</a>
-              <a class="dropdown-item text-danger" href="#">Remove Data</a>
-            </div>
-          </div>
+          <h5 class="card-category">Nombre de</h5>
+          <h4 class="card-title">Messages par mois</h4>
+          
         </div>
-        <div class="card-body">
+        <div class="card-body py-2">
 
         
         {{-- !!!!!!!!!!!!!!!!!!!!!!   charts tani --}}
 
-          <div class="chart-area">
+          <div class="chart-area mb-1">
             <canvas id="lineChartExample"></canvas>
           </div>
 
@@ -50,7 +41,6 @@
         </div>
         <div class="card-footer">
           <div class="stats">
-            <i class="now-ui-icons arrows-1_refresh-69"></i> Just Updated
           </div>
         </div>
       </div>
@@ -58,19 +48,9 @@
     <div class="col-lg-4 col-md-6">
       <div class="card card-chart">
         <div class="card-header">
-          <h5 class="card-category">2018 Sales</h5>
-          <h4 class="card-title">All products</h4>
-          <div class="dropdown">
-            <button type="button" class="btn btn-round btn-outline-default dropdown-toggle btn-simple btn-icon no-caret" data-toggle="dropdown">
-              <i class="now-ui-icons loader_gear"></i>
-            </button>
-            <div class="dropdown-menu dropdown-menu-right">
-              <a class="dropdown-item" href="#">Action</a>
-              <a class="dropdown-item" href="#">Another action</a>
-              <a class="dropdown-item" href="#">Something else here</a>
-              <a class="dropdown-item text-danger" href="#">Remove Data</a>
-            </div>
-          </div>
+          <h5 class="card-category">Nombre de</h5>
+          <h4 class="card-title">Fichiers Ajoutés par mois</h4>
+         
         </div>
         <div class="card-body">
 
@@ -82,7 +62,7 @@
         </div>
         <div class="card-footer">
           <div class="stats">
-            <i class="now-ui-icons arrows-1_refresh-69"></i> Just Updated
+            
           </div>
         </div>
       </div>
@@ -90,8 +70,8 @@
     <div class="col-lg-4 col-md-6">
       <div class="card card-chart">
         <div class="card-header">
-          <h5 class="card-category">Email Statistics</h5>
-          <h4 class="card-title">24 Hours Performance</h4>
+          <h5 class="card-category">Nombre de</h5>
+          <h4 class="card-title">Commentaires ajoutés par mois</h4>
         </div>
         <div class="card-body">
 
@@ -103,7 +83,6 @@
         </div>
         <div class="card-footer">
           <div class="stats">
-            <i class="now-ui-icons ui-2_time-alarm"></i> Last 7 days
           </div>
         </div>
       </div>
@@ -113,79 +92,23 @@
     <div class="col-md-6">
       <div class="card  card-tasks">
         <div class="card-header ">
-          <h5 class="card-category">Backend development</h5>
-          <h4 class="card-title">Tasks</h4>
+          <h4 class="card-title"> Statistiques Générales </h4>
         </div>
         <div class="card-body ">
-          <div class="table-full-width table-responsive">
-            <table class="table">
-              <tbody>
-                <tr>
-                  <td>
-                    <div class="form-check">
-                      <label class="form-check-label">
-                        <input class="form-check-input" type="checkbox" checked>
-                        <span class="form-check-sign"></span>
-                      </label>
-                    </div>
-                  </td>
-                  <td class="text-left">Sign contract for "What are conference organizers afraid of?"</td>
-                  <td class="td-actions text-right">
-                    <button type="button" rel="tooltip" title="" class="btn btn-info btn-round btn-icon btn-icon-mini btn-neutral" data-original-title="Edit Task">
-                      <i class="now-ui-icons ui-2_settings-90"></i>
-                    </button>
-                    <button type="button" rel="tooltip" title="" class="btn btn-danger btn-round btn-icon btn-icon-mini btn-neutral" data-original-title="Remove">
-                      <i class="now-ui-icons ui-1_simple-remove"></i>
-                    </button>
-                  </td>
-                </tr>
-                <tr>
-                  <td>
-                    <div class="form-check">
-                      <label class="form-check-label">
-                        <input class="form-check-input" type="checkbox">
-                        <span class="form-check-sign"></span>
-                      </label>
-                    </div>
-                  </td>
-                  <td class="text-left">Lines From Great Russian Literature? Or E-mails From My Boss?</td>
-                  <td class="td-actions text-right">
-                    <button type="button" rel="tooltip" title="" class="btn btn-info btn-round btn-icon btn-icon-mini btn-neutral" data-original-title="Edit Task">
-                      <i class="now-ui-icons ui-2_settings-90"></i>
-                    </button>
-                    <button type="button" rel="tooltip" title="" class="btn btn-danger btn-round btn-icon btn-icon-mini btn-neutral" data-original-title="Remove">
-                      <i class="now-ui-icons ui-1_simple-remove"></i>
-                    </button>
-                  </td>
-                </tr>
-                <tr>
-                  <td>
-                    <div class="form-check">
-                      <label class="form-check-label">
-                        <input class="form-check-input" type="checkbox" checked>
-                        <span class="form-check-sign"></span>
-                      </label>
-                    </div>
-                  </td>
-                  <td class="text-left">Flooded: One year later, assessing what was lost and what was found when a ravaging rain swept through metro Detroit
-                  </td>
-                  <td class="td-actions text-right">
-                    <button type="button" rel="tooltip" title="" class="btn btn-info btn-round btn-icon btn-icon-mini btn-neutral" data-original-title="Edit Task">
-                      <i class="now-ui-icons ui-2_settings-90"></i>
-                    </button>
-                    <button type="button" rel="tooltip" title="" class="btn btn-danger btn-round btn-icon btn-icon-mini btn-neutral" data-original-title="Remove">
-                      <i class="now-ui-icons ui-1_simple-remove"></i>
-                    </button>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+          
+
+          <div class="chart-area mt-n2">
+            <canvas id="SexeDonutsChart" class="w-100"></canvas>
           </div>
+
+          <div class="chart-area ">
+            <canvas id="UsersTypesDonut" class="w-100"></canvas>
+          </div>
+
         </div>
         <div class="card-footer ">
           <hr>
           <div class="stats">
-            <i class="now-ui-icons loader_refresh spin"></i> Updated 3 minutes ago
           </div>
         </div>
       </div>
@@ -198,7 +121,7 @@
         </div>
         <div class="card-body">
           <div class="table-responsive">
-            <table class="table">
+            <table class="table mb-2 py-4">
               <thead class=" text-primary">
                 <th>
                   Nom 
@@ -249,12 +172,87 @@
 
 @section('scripts')
 <script>
-  var url = "{{url('test')}}";
+  const url = "{{url('/')}}";
+  var nbr_messages_labels   = [
+                    "Janvier",
+                    "Fevrier",
+                    "Mars",
+                    "Avril",
+                    "Mai",
+                    "Juin",
+                    "Juillet",
+                    "Aout",
+                    "Septembre",
+                    "Octobre",
+                    "Novembre",
+                    "Decembre",
+                ];
+    var nbr_fichiers_labels = [...nbr_messages_labels];
+    var nbr_comments_labels = [...nbr_messages_labels];
+
+  var nbr_messages_data  =  [
+                            100,
+                            100,
+                            100,
+                            100,
+                            100,
+                            100,
+                            100,
+                            100,
+                            100,
+                            100,
+                            100,
+                            100,
+                        ];
+    var nbr_fichiers_data = [...nbr_messages_data];
+    var nbr_comments_data = [...nbr_messages_data];
+    var Sexedata =[1,1];
+    var Typesdata2=[1,1];
+
         $(document).ready(function(){     
-          $.get(url, function(response){
+
+          $.get(url+"/api/Stats/Messages", function(response){
+            let stop = parseInt( response.current );
+            for(let i=12;i>=stop;i--){
+              nbr_messages_data.splice(i,1);
+              nbr_messages_labels.splice(i,1);
+            }for(let i=0;i<=stop-1;i++){
+              nbr_messages_data[i]=parseInt( response.data[i+1] );
+            }});
+            
+
+            $.get(url+"/api/Stats/Fichiers", function(response){
+            let stop = parseInt( response.current );
+            for(let i=12;i>=stop;i--){
+              nbr_fichiers_data.splice(i,1);
+              nbr_fichiers_labels.splice(i,1);
+            }for(let i=0;i<=stop-1;i++){
+              nbr_fichiers_data[i]=parseInt( response.data[i+1] );
+            }});
+
+
+            $.get(url+"/api/Stats/Comments", function(response){
+            let stop = parseInt( response.current );
+            for(let i=12;i>=stop;i--){
+              nbr_comments_data.splice(i,1);
+              nbr_comments_labels.splice(i,1);
+            }for(let i=0;i<=stop-1;i++){
+              nbr_comments_data[i]=parseInt( response.data[i+1] );
+            }});
+
+            $.get(url+"/api/Stats/Sexe", function(response){
+            Sexedata = [response.data.M,response.data.F];
+            });
+
+            $.get(url+"/api/Stats/Types", function(response){
+              Typesdata2 = [response.data.profs,response.data.etuds];
+            });
+
+
+          $.get(url+"/test", function(response){
             demo.initDashboardPageCharts(response.months, response.post_count_data, response.max);
-           // console.log(response);
               });
+          
               
             });
             

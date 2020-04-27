@@ -39,7 +39,7 @@ class CreateUsersTable extends Migration
 
         DB::table('users')->insert(
             array(
-                'email' => 'professeur1@gmail.com',
+                'email' => 'professeur1@localhost.com',
                 'password' => '$2y$10$HVeWX4ufmCL5chB1VQXTeeAg7QfklO3thHrKRw5vn0zPjqhPkHbMa',
                 'LastLogin'=>null,
                 'CreatedAt'=>'2020/01/02',

@@ -33,6 +33,7 @@ use Illuminate\Support\Facades\Mail;
 use Tymon\JWTAuth\Exceptions\JWTException;
 use Tymon\JWTAuth\Exceptions\TokenInvalidException;
 use Tymon\JWTAuth\Exceptions\TokenExpiredException;
+use Illuminate\Validation\Rule;
 
 
 class UserController extends Controller
@@ -64,10 +65,18 @@ class UserController extends Controller
 
     public function listeUser_modifier(Request $request, $id)
     { 
+
+        $this->validate($request,['email'=>'nullable|email|unique:users','activation'=> Rule::In(['1','0']) ],[
+            'email.email'    =>  ' Adresse Email est invalide ! ',
+            'email.unique'  =>  "Adresse Email est Déja enregistré !",
+            'activation.in' =>  "Choix invalide"
+        ]);
+
         //editing
-        $user =User::find($id);    
+        $user =User::find($id);
+        if($request->input('email'))    
         $user->email = $request->input('email');
-        $user->UserType = $request->input('type');
+
         $user->Activated = $request->input('activation');
         $user->update();
         $url = config('app.REACT_URL'); /// obtenir le lien du plateform Prof/Etudiant
@@ -1447,5 +1456,28 @@ class UserController extends Controller
     }
 
 
+    public function GetSexStats(){
+        $all_Stats = DB::select(" Select ( Select count(*) from professeurs Where Sex='M' ) + ( Select count(*) from etudiants Where Sex='M' ) as M , ( Select count(*) from professeurs Where Sex='F' ) + ( Select count(*) from etudiants Where Sex='F' ) as F");
+        $all_Stats = $all_Stats[0];
+        return response()->json( ['data'=>$all_Stats] );
+    }
+
+    public function GetTypesStats(){
+        $all_Stats = DB::select("select ( Select count(*) FROM users where UserType='prof' ) as profs , ( Select count(*) FROM users where UserType='etud' ) as etuds");
+        $all_Stats = $all_Stats[0];
+        return response()->json( ['data'=>$all_Stats] );
+    }
+
+    public function adminLastlogin($id){
+        $user = User::find($id);
+        if( !$user )
+            return "";
+        $new = strtotime($user->CreatedAt);
+        $new = date('Y-d-m H:i:s', $new);
+        $user->LastLogin = substr( $new,0,16); 
+        $user->CreatedAt = date('Y-d-m H:i:s')."";
+        $user->save();
+        return $user->CreatedAt."";
+    }
 
 }

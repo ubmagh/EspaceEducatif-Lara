@@ -111,6 +111,13 @@ Route::prefix('Classes')->group(function () {
 
 
 
+Route::prefix('Stats')->group(function () {
+    Route::get('Messages', 'ContactController@GetStats'); /// Nbr de messages par mois
+    Route::get('Fichiers', 'MediaController@GetStats'); /// Nbr de mes
+    Route::get('Comments', 'CommentController@GetStats'); /// Nbr deis
+    Route::get('Sexe', 'UserController@GetSexStats'); /// 
+    Route::get('Types', 'UserController@GetTypesStats'); /// 
+});
 
 
 
@@ -120,6 +127,6 @@ Route::prefix('Classes')->group(function () {
 
 
 ///// the next one i don't why it is there !
-Route::middleware('api')->get('user', function (Request $request) {
-    return $request->user();
-});
+// Route::middleware('api')->get('user', function (Request $request) {
+//     return $request->user();
+//// });

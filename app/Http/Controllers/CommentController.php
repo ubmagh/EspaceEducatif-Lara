@@ -39,4 +39,28 @@ class CommentController extends Controller
         
     }
 
+
+    public function GetStats(){
+
+        $all_Stats = DB::select(" 
+        SELECT 
+        ( SELECT count(*) FROM comments WHERE YEAR(GETDATE())=YEAR(date) and MONTH(date)=1 ) as '1',
+              ( SELECT count(*) FROM comments WHERE YEAR(GETDATE())=YEAR(date) and MONTH(date)=2 ) as '2',
+              ( SELECT count(*) FROM comments WHERE YEAR(GETDATE())=YEAR(date) and MONTH(date)=3 ) as '3',
+              ( SELECT count(*) FROM comments WHERE YEAR(GETDATE())=YEAR(date) and MONTH(date)=4 ) as '4',
+              ( SELECT count(*) FROM comments WHERE YEAR(GETDATE())=YEAR(date) and MONTH(date)=5 ) as '5',
+              ( SELECT count(*) FROM comments WHERE YEAR(GETDATE())=YEAR(date) and MONTH(date)=6 ) as '6',
+              ( SELECT count(*) FROM comments WHERE YEAR(GETDATE())=YEAR(date) and MONTH(date)=7 ) as '7',
+              ( SELECT count(*) FROM comments WHERE YEAR(GETDATE())=YEAR(date) and MONTH(date)=8 ) as '8',
+              ( SELECT count(*) FROM comments WHERE YEAR(GETDATE())=YEAR(date) and MONTH(date)=9 ) as '9',
+              ( SELECT count(*) FROM comments WHERE YEAR(GETDATE())=YEAR(date) and MONTH(date)=10) as '10',
+              ( SELECT count(*) FROM comments WHERE YEAR(GETDATE())=YEAR(date) and MONTH(date)=11) as '11',
+              ( SELECT count(*) FROM comments WHERE YEAR(GETDATE())=YEAR(date) and MONTH(date)=12) as '12'
+          
+        ");
+        $all_Stats = $all_Stats[0];
+        return response()->json( ['data'=>$all_Stats,'current'=>date('m')] );
+
+    }
+
 }

@@ -21,17 +21,18 @@ Route::get('/', function () {
 
 Auth::routes();
 
-Route::get('/home', 'HomeController@index')->name('home');
+Route::get('/home', function(){
+  return redirect(url('/dachboard'));
+})->name('home');
 
 Route::group(['middleware' => ['auth','admin']],function(){
 
-    // route::get('/dachboard',function(){
-    // return view('homeAdmin.dachboard');
-    // });
+    
 
 
     Route::get('/dachboard', 'admin\ChartDataController@index');
-      //route::get('/dachboard','admin\ChartDataController@getMonthlyPostData');
+    Route::get('/Settings', 'admin\AdminController@SettingsView');
+    Route::post('/Settings', 'admin\AdminController@SettingsSubmit');
 
 
     route::get('/liste-etudiant','admin\DachboardController@listeEtudiant');

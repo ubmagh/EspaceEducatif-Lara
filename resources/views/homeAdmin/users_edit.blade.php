@@ -10,9 +10,9 @@
 
 @section('content')
  
-<div class="container">
-
-    <div class="row">
+    <div class="panel-header panel-header-sm">
+    </div>
+    <div class="row col-md-11 mx-auto">
         <div class="col-md-12">
             <div class="card">
                 <div class="card-header">
@@ -21,7 +21,7 @@
                 <div class="card-body">
               {{-- <div class="table-responsive"> --}}
                   {{-- hna zdet mn site bootstrap --}}
-                  <form action="/listeUser-modifier/{{ $user->id}}" method="POST">
+                  <form action="/listeUser-modifier/{{ $user->id}}" class="col-md-10 mx-auto" method="POST">
 
                       {{  csrf_field()  }}
                       {{  method_field('PUT')  }}
@@ -31,13 +31,14 @@
                         <label> E-mail </label>
                         <input type="email" class="form-control" name="email" value="{{ $user->email }}"> 
                     </div>
+                    @if( $errors->has('email') )
+                        <div class="alert alert-danger" role="alert">
+                            {{ $errors->first('email') }}
+                        </div>
+                    @endif
                    
                     <div class="form-group">
-                        <label> Type  </label>
-                        <select name="type" class="form-control" >
-                            <option value="etud" >Etudiant</option>
-                            <option value="prof">Professeur</option>                        
-                        </select> 
+                        
 
                         <label> Activation </label>
                         <select name="activation" class="form-control" >
@@ -47,6 +48,11 @@
                   
 
                     </div> 
+                    @if( $errors->has('activation') )
+                        <div class="alert alert-danger" role="alert">
+                            {{ $errors->first('activation') }}
+                        </div>
+                    @endif
 
                    <button type="submit" class="btn btn-success">Modifier</button>
                    <a href="/liste-etudiant" class="btn btn-danger">Annuler</a>
@@ -56,7 +62,6 @@
         </div>
     </div>    
 
-</div>
 @endsection
 
 @section('scripts')
