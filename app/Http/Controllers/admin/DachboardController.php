@@ -62,6 +62,9 @@ class DachboardController extends Controller
         //editing
         $users =Etudiant::find($id);
         
+        if(empty($users))
+            return redirect(url('liste-etudiant'))->with('notfound','x');
+
         $permission = Permission::where('EtudiantID',$users->id)->first();
         $permission->posting = (  $request->input('publier')  && $request->input('publier')=='on' ) ? '1': '0';
         $permission->commenting = (  $request->input('commenter')  && $request->input('commenter')=='on' ) ? '1': '0';
@@ -99,6 +102,55 @@ class DachboardController extends Controller
         return view('homeAdmin.listeProfesseur')->with('professeur',$professeur);
     }
 
+
+    public function listeProfesseur_edit (Request $request,$id){
+
+        $professeur = professeur::find($id);
+        if(empty($professeur))
+            return view('errors.404');
+        
+        return view('homeAdmin.listeProfesseur_edit')->with('professeur',$professeur);
+    }
+
+    public function ProfesseurModify(Request $request,$id){
+
+        $this->validate($request,
+        [
+            'nom'   =>  'required|min:2|max:25|regex:/^[a-z A-Z éèà]+(([\',. -][a-zA-Z ])?[a-zA-Z]*)*$/',
+            'prenom'    =>  'required|min:2|max:35|regex:/^[a-z A-Z éèà]+(([\',. -][a-zA-Z ])?[a-zA-Z]*)*$/',
+            'Matiere'   =>  'required|min:3|max:30|regex:/^[a-z A-Z éèà0-9]+(([\',. -][a-zA-Z0-9 ])?[a-zA-Z0-9]*)*$/',
+            'sex' =>  Rule::in(['M','F']),
+            'filiere' =>  Rule::in(['GE','GI'])
+        ],
+        [
+            'nom.required'  =>  "Saisissez le nom !",
+            'nom.min'  =>  "Nom invalide !",
+            'nom.max'  =>  "Nom invalide Max 25 Caractères !",
+            'nom.regex'  =>  "Nom invalide !",
+            'prenom.required'  =>  "Saisissez le prenom !",
+            'prenom.min'  =>  "Prenom invalide !",
+            'prenom.max'  =>  "Prenom invalide Max 35 Caractères!",
+            'prenom.regex'  =>  "Prenom invalide !",
+            'Matiere.required'  =>  "Saisissez la Matière  !",
+            'Matiere.regex'  =>  "Nom de la Matiere invalide !",
+            'Matiere.min'  =>  "Nom de la Matiere invalide !",
+            'Matiere.max'  =>  " Le nom de la Matiere est de 30 caractères Max",
+            'sex.in'  =>  " Choix invalide !",
+            'filiere.in'  =>  " Choix invalide !",
+        ]);
+
+        $prof = professeur::findOrfail($id);
+
+        $prof->Fname = $request->input('prenom');
+        $prof->Lname = $request->input('nom');
+        $prof->Matiere = $request->input('Matiere');
+        $prof->Sex = $request->input('sex');
+        $prof->Filiere = $request->input('filiere');
+
+        $prof->update();
+        return redirect('/liste-professeur')->with('status','Modification Faite');
+
+    }
 
 
 

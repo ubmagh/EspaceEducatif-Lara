@@ -3,7 +3,7 @@
 
 
 @section('title')
-    Edit-etud | Admin
+   Modifier un utilisateur
 @endsection
 
 
@@ -16,7 +16,7 @@
         <div class="col-md-12">
             <div class="card">
                 <div class="card-header">
-                     <h4 class="card-title"> Modification | Users</h4>
+                     <h4 class="card-title"> Modification d'un utilisateur</h4>
                 </div>
                 <div class="card-body">
               {{-- <div class="table-responsive"> --}}
@@ -40,7 +40,7 @@
                     <div class="form-group">
                         
 
-                        <label> Activation </label>
+                        <label> Activation de compte :</label>
                         <select name="activation" class="form-control" >
                             <option value="1" >Activé</option>
                             <option value="0">Désactivé</option>                        

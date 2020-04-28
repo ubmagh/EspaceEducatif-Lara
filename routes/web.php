@@ -58,6 +58,7 @@ Route::group(['middleware' => ['auth','admin']],function(){
 
     route::get('/liste-professeur','admin\DachboardController@listeProfesseur');
     route::get('/listeProfesseur-edit/{id}','admin\DachboardController@listeProfesseur_edit');
+    route::put('/listeProfesseur-modifier/{id}','admin\DachboardController@ProfesseurModify');
 
 
      route::get('/test','admin\ChartDataController@getMonthlyPostData');

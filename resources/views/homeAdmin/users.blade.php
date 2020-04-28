@@ -26,6 +26,11 @@
             {{ session('status') }}
          </div>
         @endif
+        @if(session('notfound'))
+        <div class="alert alert-danger" role="alert">
+          Etudiant introuvable !
+       </div>
+        @endif
       </div>
       <div class="modal-body">
         <form action="{{route('user-insert')}}" method="POST">
@@ -140,7 +145,7 @@
 
           
   <button class="btn btn-info dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-     Ajouter Un Utilisateurs
+     Ajouter Un Utilisateur
   </button>
   <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
     <button type="button" class="dropdown-item" data-toggle="modal" data-target="#exampleModal" >Professeur</button>

@@ -3,7 +3,7 @@
 
 
 @section('title')
-    Liste | Admin
+    Liste des professeurs
 @endsection
 
 

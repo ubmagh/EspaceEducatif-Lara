@@ -3,7 +3,7 @@
 
 
 @section('title')
-    Edit-etud | Admin
+    Modifier un Etudiant
 @endsection
 
 
@@ -11,15 +11,13 @@
 @section('content')
 
 <div class="panel-header panel-header-sm">
-    sdfsdfsdfsdfsdfsdfs
 </div>
-sqdkjsqjkjqdsknlqslk
 <div class="content">
     <div class="row">
         <div class="col-md-12">
             <div class="card">
                 <div class="card-header">
-                     <h4 class="card-title"> Modification | Etudiant</h4>
+                     <h4 class="card-title"> Modifier un Etudiant</h4>
                 </div>
                 <div class="card-body">
               {{-- <div class="table-responsive"> --}}
@@ -31,12 +29,12 @@ sqdkjsqjkjqdsknlqslk
 
                     <div class="form-group">
                         <label>  Nom </label>
-                        <input type="text" class="form-control" name="nom" value="{{ $users->Fname }}"> 
+                        <input type="text" class="form-control" name="nom" value="{{ $users->Lname }}"> 
                     </div>
                     
                     <div class="form-group">
                         <label> Prénom </label>
-                        <input type="text" class="form-control" name="prenom" value="{{ $users->Lname }}"> 
+                        <input type="text" class="form-control" name="prenom" value="{{ $users->Fname }}"> 
                     </div> 
                     
                     <div class="form-group">

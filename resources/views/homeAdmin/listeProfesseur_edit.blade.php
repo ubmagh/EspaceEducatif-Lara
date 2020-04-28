@@ -2,7 +2,7 @@
 
 
 @section('title')
-    Modifier un Etudiant
+    Modifier un Professeur
 @endsection
 
 
@@ -16,10 +16,10 @@
     <div class="col-md-8">
       <div class="card">
         <div class="card-header">
-          <h5 class="title"> Modifier un Etudiant  </h5>
+          <h5 class="title"> Modifier un Professeur </h5>
         </div>
         <div class="card-body">
-          <form action="/listeEtudiant-modifier/{{$users->id}}" method="POST">
+          <form action="{{ url('/listeProfesseur-modifier/'.$professeur->id) }}" method="POST">
 
             {{  csrf_field()  }}
             {{  method_field('PUT')  }}
@@ -28,13 +28,13 @@
               <div class="col-md-5 pr-1">
                 <div class="form-group">
                   <label>ID</label>
-                  <input type="text" class="form-control" disabled="" value="{{$users->id}}">
+                  <input type="text" class="form-control" disabled="" value="{{$professeur->id}}">
                 </div>
               </div>
               <div class="col-md-3 px-1">
                 <div class="form-group">
                   <label> Nom </label>
-                  <input type="text" class="form-control" name="nom" value="{{ $users->Lname }}">
+                  <input type="text" class="form-control" name="nom" value="{{ $professeur->Lname }}">
                 </div>
                 @if ($errors->has('nom'))
                   <div class="alert alert-warning" role="alert">
@@ -45,7 +45,7 @@
               <div class="col-md-4 pl-1">
                 <div class="form-group">
                   <label>Prénom</label>
-                  <input type="text" class="form-control" name="prenom" value="{{ $users->Fname }}">
+                  <input type="text" class="form-control" name="prenom" value="{{ $professeur->Fname }}">
                 </div>
                 @if ($errors->has('prenom'))
                   <div class="alert alert-warning" role="alert">
@@ -57,64 +57,20 @@
             <div class="row">
               <div class="col-md-6 pr-1">
                 <div class="form-group">
-                  <label>CIN</label>
-                    <input type="text" class="form-control" name="cin" value="{{ $users->CIN }}">
+                  <label>Matiere</label>
+                    <input type="text" class="form-control" name="Matiere" value="{{ $professeur->Matiere }}">
                 </div>
-                @if ($errors->has('cin'))
+                @if ($errors->has('matiere'))
                   <div class="alert alert-warning" role="alert">
-                   {{ $errors->first('cin') }}
-                  </div>
-                @endif
-                @if (session('cin')=='taken')
-                  <div class="alert alert-warning" role="alert">
-                   Cin enregistré déja pour un autre étudiant
+                   {{ $errors->first('matiere') }}
                   </div>
                 @endif
               </div>
               <div class="col-md-6 pl-1">
-                <div class="form-group">
-                  <label>Date de Naissance</label>
-                  <input type="date" class="form-control" name="naissance" value="{{$users->dateNaissance}}">
-                </div>
-                @if ($errors->has('naissance'))
-                  <div class="alert alert-warning" role="alert">
-                   {{ $errors->first('naissance') }}
-                  </div>
-                @endif
+                
               </div>
             </div>
             <div class="row">
-              <div class="col-md-12">
-                <div class="form-group">
-                  <label> Permissions:  </label>
-                  <div class="row">
-                    <div class="col-md text-center">
-                      <input type="checkbox" name="publier" class="" id="exampleCheck1" {{ $permissions->posting ? 'checked':'' }} >
-                      <label class="" for="exampleCheck1">Publier</label>
-                    </div>                   
-                    <div class="col-md text-center ">
-                      <input type="checkbox" name="commenter" class="" id="exampleCheck2" {{ $permissions->commenting ? 'checked':'' }}>
-                      <label class="" for="exampleCheck2">Commenter</label>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="row">
-              <div class="col-md-4 pr-1">
-                <div class="form-group">
-                  <label>Année</label>
-                     <select name="annee" class="form-control" >
-                        <option value="1" >1</option>
-                        <option value="2">2</option>                        
-                    </select> 
-                </div>
-                @if ($errors->has('annee'))
-                  <div class="alert alert-warning" role="alert">
-                   {{ $errors->first('annee') }}
-                  </div>
-                @endif
-              </div>
               <div class="col-md-4 px-1">
                 <div class="form-group">
                   <label>Sex</label>
@@ -147,13 +103,13 @@
             </div>
            
             <button type="submit" class="btn btn-success">Modifier</button>
-            <a href="/liste-etudiant" class="btn btn-danger">Annuler</a>
+        <a href="{{ url('/liste-professeur') }}" class="btn btn-danger">Annuler</a>
           </form>
 
         </div>
       </div>
     </div>
-    <div class="col-md-4 py-3">
+    <div class="col-md-4">
       <div class="card card-user ">
         <div class="image" style="background-color: rgb(14,41,73);">
           
@@ -161,14 +117,12 @@
         <div class="card-body">
           <div class="author">
           
-              <img class="avatar border-gray" src="{{ asset('images/Avatars/' .$users->AvatarPath)}}" alt="Image">
-              <h5 class="title">{{ $users->Fname }} {{ $users->Lname }}</h5>
+              <img class="avatar border-gray" src="{{ asset('images/Avatars/' .$professeur->AvatarPath)}}" alt="Image">
+              <h5 class="title">{{ $professeur->Fname }} {{ $professeur->Lname }}</h5>
                       
           </div>
           <p class="description text-center">
-            Etudiant <br>
-            {{ $users->Annee }} Année<br>
-            {{ $users->Filiere}}
+            {{ $professeur->Filiere}}
           </p>
         </div>
         <hr>
