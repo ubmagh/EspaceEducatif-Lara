@@ -36,12 +36,22 @@
                   <label> Nom </label>
                   <input type="text" class="form-control" name="nom" value="{{ $users->Fname }}">
                 </div>
+                @if ($errors->has('nom'))
+                  <div class="alert alert-warning" role="alert">
+                   {{ $errors->first('nom') }}
+                  </div>
+                @endif
               </div>
               <div class="col-md-4 pl-1">
                 <div class="form-group">
                   <label>Prénom</label>
                   <input type="text" class="form-control" name="prenom" value="{{ $users->Lname }}">
                 </div>
+                @if ($errors->has('prenom'))
+                  <div class="alert alert-warning" role="alert">
+                   {{ $errors->first('prenom') }}
+                  </div>
+                @endif
               </div>
             </div>
             <div class="row">
@@ -50,19 +60,43 @@
                   <label>CIN</label>
                     <input type="text" class="form-control" name="cin" value="{{ $users->CIN }}">
                 </div>
+                @if ($errors->has('cin'))
+                  <div class="alert alert-warning" role="alert">
+                   {{ $errors->first('cin') }}
+                  </div>
+                @endif
+                @if (session('cin')=='taken')
+                  <div class="alert alert-warning" role="alert">
+                   Cin enregistré déja pour un autre étudiant
+                  </div>
+                @endif
               </div>
               <div class="col-md-6 pl-1">
                 <div class="form-group">
                   <label>Date de Naissance</label>
-                  <input type="text" class="form-control" name="naissance" value="{{$users->dateNaissance}}">
+                  <input type="date" class="form-control" name="naissance" value="{{$users->dateNaissance}}">
                 </div>
+                @if ($errors->has('naissance'))
+                  <div class="alert alert-warning" role="alert">
+                   {{ $errors->first('naissance') }}
+                  </div>
+                @endif
               </div>
             </div>
             <div class="row">
               <div class="col-md-12">
                 <div class="form-group">
-                  <label>E-mail</label>
-                  <input type="email" class="form-control" name="email" value="{{ $users->email }}">
+                  <label> Permissions:  </label>
+                  <div class="row">
+                    <div class="col-md text-center">
+                      <input type="checkbox" name="publier" class="" id="exampleCheck1" {{ $permissions->posting ? 'checked':'' }} >
+                      <label class="" for="exampleCheck1">Publier</label>
+                    </div>                   
+                    <div class="col-md text-center ">
+                      <input type="checkbox" name="commenter" class="" id="exampleCheck2" {{ $permissions->commenting ? 'checked':'' }}>
+                      <label class="" for="exampleCheck2">Commenter</label>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -75,6 +109,11 @@
                         <option value="2">2</option>                        
                     </select> 
                 </div>
+                @if ($errors->has('annee'))
+                  <div class="alert alert-warning" role="alert">
+                   {{ $errors->first('annee') }}
+                  </div>
+                @endif
               </div>
               <div class="col-md-4 px-1">
                 <div class="form-group">
@@ -84,20 +123,29 @@
                       <option value="F">F</option>                        
                     </select> 
                 </div>
+                @if ($errors->has('sex'))
+                  <div class="alert alert-warning" role="alert">
+                   {{ $errors->first('sex') }}
+                  </div>
+                @endif
               </div>
               <div class="col-md-4 pl-1">
                 <div class="form-group">
                   <label>Filière </label>
                      <select name="filiere" class="form-control" >
                        <option value="GI" >GI</option>
-                      <option value="GE">GE</option>                        
+                        <option value="GE">GE</option>                        
                      </select> 
 
                 </div>
+                @if ($errors->has('filiere'))
+                  <div class="alert alert-warning" role="alert">
+                   {{ $errors->first('filiere') }}
+                  </div>
+                @endif
               </div>
             </div>
            
-{{-- hadi yalah ztha --}}
             <button type="submit" class="btn btn-success">Modifier</button>
             <a href="/liste-etudiant" class="btn btn-danger">Annuler</a>
           </form>
@@ -105,10 +153,10 @@
         </div>
       </div>
     </div>
-    <div class="col-md-4">
-      <div class="card card-user">
-        <div class="image">
-          <img src="../assets/img/bg5.jpg" alt="...">
+    <div class="col-md-4 py-3">
+      <div class="card card-user ">
+        <div class="image" style="background-color: rgb(14,41,73);">
+          
         </div>
         <div class="card-body">
           <div class="author">
@@ -124,17 +172,7 @@
           </p>
         </div>
         <hr>
-        <div class="button-container">
-          <button href="#" class="btn btn-neutral btn-icon btn-round btn-lg">
-            <i class="fab fa-facebook-f"></i>
-          </button>
-          <button href="#" class="btn btn-neutral btn-icon btn-round btn-lg">
-            <i class="fab fa-twitter"></i>
-          </button>
-          <button href="#" class="btn btn-neutral btn-icon btn-round btn-lg">
-            <i class="fab fa-google-plus-g"></i>
-          </button>
-        </div>
+        
       </div>
     </div>
   </div>
