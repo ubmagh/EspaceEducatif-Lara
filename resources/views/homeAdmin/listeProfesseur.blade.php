@@ -17,7 +17,7 @@
     <div class="col-md-12">
       <div class="card">
         <div class="card-header">
-          <h5 class="card-title"> Liste | Professeurs</h5>
+          <h5 class="card-title"> Liste Des Professeurs</h5>
 
           @if (session('status'))
           <div class="alert alert-success" role="alert">

@@ -188,7 +188,7 @@ class MediaController extends Controller
 			( SELECT count(*) FROM media WHERE YEAR(GETDATE())=YEAR(date) and MONTH(date)=12) as '12'
         ");
         $all_Stats = $all_Stats[0];
-        return response()->json( ['data'=>$all_Stats] );
+        return response()->json( ['data'=>$all_Stats,'current'=>date('m')] );
 
 
 

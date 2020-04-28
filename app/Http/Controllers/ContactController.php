@@ -5,6 +5,9 @@ namespace App\Http\Controllers;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use App\Contact;
+use App\Etudiant;
+use App\professeur;
+use App\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 
@@ -73,8 +76,40 @@ class ContactController extends Controller
         ");
         $all_Stats = $all_Stats[0];
         return response()->json( ['data'=>$all_Stats,'current'=>date('m')] );
+    }
 
+    public function View(Request $request){
+        $messages = Contact::all();
+        return view('homeAdmin.MessagesList')->with('messages',$messages);
+    }
 
+    public function ViewMessage(Request $request, $id){
+        $message = Contact::find($id);
+        if( empty($message) )
+            return view('errors.404');
+        
+        if( $message->type=="interne" ){
+            $user = User::where('email',$message->email)->first();
+            if(!empty($user)){
+                if($user->UserType=="prof"){
+                    $prof = professeur::where('email',$message->email)->first();
+                    $message->name = $prof->Lname.' '.$prof->Fname;
+                }else{
+                    $etud=  Etudiant::where('email',$message->email)->first();
+                    $message->name = $etud->Lname.' '.$etud->Fname;
+                }
+            }
+        }
+        
+        return view('homeAdmin.Message')->with(['message'=>$message]);
+    }
+
+    public function delete(Request $request, $id){
+        $message = Contact::find($id);
+        if( empty($message) )
+            return view('errors.404');
+        $message->delete();
+        return redirect(url('/Messages'))->with('status','success');
     }
 
 }

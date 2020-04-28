@@ -34,7 +34,7 @@
         {{-- !!!!!!!!!!!!!!!!!!!!!!   charts tani --}}
 
           <div class="chart-area mb-1">
-            <canvas id="lineChartExample"></canvas>
+            <canvas id="lineChartExample" class=""></canvas>
           </div>
 
 

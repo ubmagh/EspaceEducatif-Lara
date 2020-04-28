@@ -3,7 +3,7 @@
 
 
 @section('title')
-    Liste | Admin
+    Liste des Etudiants 
 @endsection
 
 
@@ -21,7 +21,7 @@
     <div class="col-md-12">
       <div class="card">
         <div class="card-header">
-          <h5 class="card-title"> Liste | Etudiant</h5>
+          <h5 class="card-title"> Liste Des Etudiant</h5>
 
           @if (session('status'))
           <div class="alert alert-success" role="alert">

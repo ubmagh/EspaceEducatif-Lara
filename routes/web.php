@@ -63,4 +63,10 @@ Route::group(['middleware' => ['auth','admin']],function(){
      route::get('/test','admin\ChartDataController@getMonthlyPostData');
 
 
+     // Messages Routes
+
+     Route::get('/Messages','ContactController@View');
+     Route::get('/Messages/{id}','ContactController@ViewMessage');
+     Route::get('/Messages/del/{id}','ContactController@delete');
+
 });
