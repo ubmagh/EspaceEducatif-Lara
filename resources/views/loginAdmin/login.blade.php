@@ -16,7 +16,7 @@
         </div>
         <div class="form">
             <div class="thumbnail"><img src="{{ asset('loginAdmin') }}/image/logo.jpg"></div>
-            <form method="POST" action="{{ route('login') }}">
+            <form method="POST" class="mb-3 " action="{{ route('login') }}">
                 @csrf
                 {{-- <form class="login-form"> --}}
                 <input type="email" placeholder="E-MAIL" name="email" />
@@ -33,6 +33,7 @@
 
 
             </form>
+        <a href="{{ url('/forgot') }}" class="d-block mx-auto mt-4  "> <i class="fas fa-question"></i> Mot de passe oublié ? </a>
         </div>
     </body>
 

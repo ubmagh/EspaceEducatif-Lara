@@ -21,6 +21,16 @@ Route::get('/', function () {
 
 Auth::routes();
 
+
+Route::middleware('guest')->get('forgot',function(){
+  return view('loginAdmin.forgot');
+});
+Route::middleware('guest')->post('forgot','admin\AdminController@SendPwdReset');
+Route::middleware('guest')->get('/Reset/{token?}','admin\AdminController@getForm');
+Route::middleware('guest')->post('/Reset','admin\AdminController@Reset');
+
+
+
 Route::get('/home', function(){
   return redirect(url('/dachboard'));
 })->name('home');
