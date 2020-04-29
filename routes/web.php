@@ -47,12 +47,14 @@ Route::group(['middleware' => ['auth','admin']],function(){
 
     route::get('/liste-etudiant','admin\DachboardController@listeEtudiant');
     route::get('/listeEtudiant-edit/{id}','admin\DachboardController@listeEtudiant_edit');
+    route::post('/Etudiant-insert','admin\DachboardController@EtudiantInsert')->name('etud-insert');
     route::put('/listeEtudiant-modifier/{id}','admin\DachboardController@listeEtudiant_modifier');
     route::delete('/listeEtudiant-delete/{id}','admin\DachboardController@listeEtudiant_supprimer');
 
     route::get('/liste-utilisateur','UserController@listeUser');
     route::get('/listeUser-edit/{id}','UserController@listeUser_edit');
     route::put('/listeUser-modifier/{id}','UserController@listeUser_modifier');
+    route::delete('/listeUser-delete/{id}','UserController@listeUser_delete');
     route::post('/user-insert','UserController@user_professeur_insert')->name('user-insert');
 
 

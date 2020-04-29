@@ -36,6 +36,17 @@
                             {{ $errors->first('email') }}
                         </div>
                     @endif
+
+                    <div class="form-group">
+                        <label> Mot de passe : </label>
+                        <input type="password" class="form-control" name="password" value=""> 
+                        <small class="text-muted"> laissé null si n'est pas modifiable. </small>
+                    </div>
+                    @if( $errors->has('password') )
+                        <div class="alert alert-danger" role="alert">
+                            {{ $errors->first('password') }}
+                        </div>
+                    @endif
                    
                     <div class="form-group">
                         
@@ -55,7 +66,7 @@
                     @endif
 
                    <button type="submit" class="btn btn-success">Modifier</button>
-                   <a href="/liste-etudiant" class="btn btn-danger">Annuler</a>
+                   <a href="/liste-utilisateur" class="btn btn-danger">Annuler</a>
                    </form>
                 </div>
             </div>

@@ -7,6 +7,7 @@ use App\Etudiant;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Permission;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 
 class DachboardController extends Controller
@@ -16,7 +17,63 @@ class DachboardController extends Controller
     { 
         //first strep:: njibo data model
         $etudiants = Etudiant::all();
-        return view('homeAdmin.listeEtudiant')->with('etudiants',$etudiants);
+        $emails = DB::select(" SELECT email FROM users WHERE UserType='etud' AND email not in ( SELECT email from etudiants ) ");
+        return view('homeAdmin.listeEtudiant')->with(['etudiants'=>$etudiants,'emails'=>$emails]);
+    }
+
+    public function EtudiantInsert(Request $request){
+        $emails=[];
+        $emails__ = DB::select(" SELECT email FROM users WHERE UserType='etud' AND email not in ( SELECT email from etudiants ) ");
+        foreach($emails__ as $email){
+            array_push($emails,$email->email);
+        }
+
+        $this->validate($request,
+        [
+            'Lname'   =>  'required|min:2|max:25|regex:/^[a-z A-Z éèà]+(([\',. -][a-zA-Z ])?[a-zA-Z]*)*$/',
+            'Fname'    =>  'required|min:2|max:35|regex:/^[a-z A-Z éèà]+(([\',. -][a-zA-Z ])?[a-zA-Z]*)*$/',
+            'email' =>  ['required','email',Rule::in($emails)],
+            'cin'   =>  'required|min:7|max:12|regex:/^[a-z A-Z 0-9]+(([0-9a-zA-Z ])?[a-zA-Z0-9]*)*$/',
+            'naissance' =>  'required|date',
+            'annee' =>  Rule::in(['1','2']),
+            'sex' =>  Rule::in(['M','F']),
+            'filiere' =>  Rule::in(['GE','GI'])
+        ],
+        [
+            'Lname.required'  =>  "Saisissez le nom !",
+            'Lname.min'  =>  "Nom invalide !",
+            'Lname.max'  =>  "Nom invalide Max 25 Caractères !",
+            'Lname.regex'  =>  "Nom invalide !",
+            'Fname.required'  =>  "Saisissez le prenom !",
+            'Fname.min'  =>  "Prenom invalide !",
+            'Fname.max'  =>  "Prenom invalide Max 35 Caractères!",
+            'Fname.regex'  =>  "Prenom invalide !",
+            'cin.required'  =>  "Saisissez le CIN  !",
+            'cin.regex'  =>  "CIN invalide !",
+            'cin.min'  =>  "CIN invalide !",
+            'cin.max'  =>  "CIN invalide !",
+            'naissance.required'  =>  "Saisissez la date de naissance !",
+            'naissance.date'  =>  " date de naissance Invalide !",
+            'annee.in'  =>  " Choix invalide !",
+            'sex.in'  =>  " Choix invalide !",
+            'filiere.in'  =>  " Choix invalide !",
+            'email.in'  =>  " Choix invalide !",
+            'email.required'  =>  " Choix invalide !",
+            'email.email'  =>  " Choix invalide !",
+        ]);
+
+        $etudiant = new Etudiant();
+        $etudiant->Fname = $request->input('Fname');
+        $etudiant->Lname = $request->input('Lname');
+        $etudiant->Sex = $request->input('sex');
+        $etudiant->email = $request->input('email');
+        $etudiant->CIN = $request->input('cin');
+        $etudiant->dateNaissance = $request->input('naissance');
+        $etudiant->Annee = $request->input('annee');
+        $etudiant->Filiere = $request->input('filiere');
+        $etudiant->AvatarPath = ($request->input('sex') == "M")? "DefM.png":"DefF.png";
+        $etudiant->save();
+        return redirect(url('/liste-etudiant'))->with('status','Etudiant Bien Créé');
     }
 
     public function listeEtudiant_edit(Request $request, $id)

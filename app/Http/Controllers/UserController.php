@@ -66,16 +66,26 @@ class UserController extends Controller
     public function listeUser_modifier(Request $request, $id)
     { 
 
-        $this->validate($request,['email'=>'nullable|email|unique:users','activation'=> Rule::In(['1','0']) ],[
+        $this->validate($request,
+        [
+            'email'=>'nullable|email|unique:users',
+            'activation'=> Rule::In(['1','0']) ,
+            'password'  =>  'nullable|min:6'
+        ],
+        [
             'email.email'    =>  ' Adresse Email est invalide ! ',
             'email.unique'  =>  "Adresse Email est Déja enregistré !",
-            'activation.in' =>  "Choix invalide"
+            'activation.in' =>  "Choix invalide",
+            'password.min'  =>  "Mot de passe doit etre au min 6Caractères"
         ]);
 
         //editing
         $user =User::find($id);
         if($request->input('email'))    
         $user->email = $request->input('email');
+
+        if($request->input('password'))    
+        $user->password = Hash::make( $request->input('password') );
 
         $user->Activated = $request->input('activation');
         $user->update();
@@ -86,54 +96,48 @@ class UserController extends Controller
         return redirect('/liste-utilisateur')->with('status','Modification Faite');
     }
 
+    public function listeUser_delete(Request $request, $id){
+        $user = User::find($id);
+        if(empty($user))
+            return redirect(url('/liste-utilisateur'))->with('notfound','x');
+        else 
+        $user->delete();
+        return redirect(url('/liste-utilisateur'))->with('status','bien supprimé');
+    }
+
     public function user_professeur_insert(Request $request)
     {
-        // hna ra la3b ela une formulaire walaqin b 2 table 
+
+        $this->validate( $request,
+        [
+            'email' =>  'required|unique:users|email',
+            'password'  =>  'required|min:6',
+            'type'  =>  Rule::in(['prof','etud']),
+            'activation'    =>  Rule::in(['1','0'])
+        ],
+        [
+            'email.required'    =>  " Saisissez l'adresse Email ! ",
+            'email.unique'  =>  'adresse  Email est déja enregistré ',
+            'email.email'   =>  "adresse  Email saisi est invalide !",
+            'password.required'  =>  'Saisissez le mot de passe',
+            'password.min'  =>  'Le mot de passe est de 6 caractères au Min',
+            'type.in'   =>  "choix invalide !",
+            'activation.in' =>  "choix invalide !"
+        ]
+        );
+
+
      $users=new User;
      $users->email=$request->input('email');
      $users->password=Hash::make($request->input('password'));
-    $users->Activated='1';
-    $users->UserType='prof';
+    $users->Activated=$request->input('activation');
+    $users->UserType=$request->input('type');
     $users->CreatedAt=''.date('Y-d-m H:i:s');
-    
 
 
-
-
-
-
-     $prof=new professeur;
-     $prof->Fname=$request->input('nom');
-     $prof->Lname=$request->input('prenom');
-      $prof->email=$request->input('email');
      
-     $prof->Filiere=$request->input('filiere');
-     $prof->Sex=$request->input('sex');
-     $prof->Matiere=$request->input('matiere');
-
-     if($request->input('sex')=="M")
-     $prof->AvatarPath="DefTM.png";
-     else
-     $prof->AvatarPath="DefTF.png";
-     
-    //  if($request->hasFile('image'))
-    //  {
-    //      $file=$request->file('image');
-    //      $extension=$file->getClientOriginalExtension();
-    //      $filename=time() . '.' .$extension;
-    //      $file->move('uploads/professeur/', $filename);
-    //      $prof->AvatarPath=$filename;
-    //  }
-    //  else
-    //  {
-    //     return "qsdqqsdqsdsq";
-    //     $prof->AvatarPath='';
-    //  }
-      $users->save();
-      $prof->save();
-
-
-     return redirect('/liste-utilisateur')->with('success','Data added for');
+    $users->save();
+     return redirect('/liste-utilisateur')->with('status','Utilisateur Bien Créer');
     }
 
 
