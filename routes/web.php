@@ -55,12 +55,14 @@ Route::group(['middleware' => ['auth','admin']],function(){
     route::get('/listeUser-edit/{id}','UserController@listeUser_edit');
     route::put('/listeUser-modifier/{id}','UserController@listeUser_modifier');
     route::delete('/listeUser-delete/{id}','UserController@listeUser_delete');
-    route::post('/user-insert','UserController@user_professeur_insert')->name('user-insert');
+    route::post('/user-insert','UserController@user_insert')->name('user-insert');
 
 
     route::get('/liste-professeur','admin\DachboardController@listeProfesseur');
     route::get('/listeProfesseur-edit/{id}','admin\DachboardController@listeProfesseur_edit');
     route::put('/listeProfesseur-modifier/{id}','admin\DachboardController@ProfesseurModify');
+    route::delete('/listeprof-delete/{id}','admin\DachboardController@prof_delete');
+    route::post('/professeur-insert','admin\DachboardController@prof_insert')->name('prof-insert');
 
 
      route::get('/test','admin\ChartDataController@getMonthlyPostData');

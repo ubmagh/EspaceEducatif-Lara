@@ -145,7 +145,7 @@ class DachboardController extends Controller
     {
         $users =Etudiant::findOrFail($id);
         $users->delete();
-        return redirect('/liste-etudiant')->with('status','Supprimation Faite');
+        return redirect('/liste-etudiant')->with('status','Supprission Faite');
     }
     
 
@@ -155,10 +155,67 @@ class DachboardController extends Controller
     public function listeProfesseur()
     { 
         //first strep:: njibo data model
+        $emails = DB::select(" SELECT email FROM users WHERE UserType='prof' AND email not in ( SELECT email from professeurs ) ");
         $professeur = professeur::all();
-        return view('homeAdmin.listeProfesseur')->with('professeur',$professeur);
+        return view('homeAdmin.listeProfesseur')->with(['professeur'=>$professeur,'emails'=>$emails]);
     }
 
+
+    public function prof_insert(Request $request){
+
+        $emails=[];
+        $emails__ =DB::select(" SELECT email FROM users WHERE UserType='prof' AND email not in ( SELECT email from professeurs ) ");
+        foreach($emails__ as $email){
+            array_push($emails,$email->email);
+        }
+
+        $this->validate($request,
+        [
+            'Lname'   =>  'required|min:2|max:25|regex:/^[a-z A-Z éèà]+(([\',. -][a-zA-Z ])?[a-zA-Z]*)*$/',
+            'Fname'    =>  'required|min:2|max:35|regex:/^[a-z A-Z éèà]+(([\',. -][a-zA-Z ])?[a-zA-Z]*)*$/',
+            'email' =>  ['required','email',Rule::in($emails)],
+            'matiere'   =>  'required|max:30|regex:/^[a-z A-Zàéè 0-9]+(([0-9a-zA-Zéçàè ])?[a-zA-Z0-9]*)*$/',
+            'sex' =>  Rule::in(['M','F']),
+            'filiere' =>  Rule::in(['GE','GI'])
+        ],
+        [
+            'Lname.required'  =>  "Saisissez le nom !",
+            'Lname.min'  =>  "Nom invalide !",
+            'Lname.max'  =>  "Nom invalide Max 25 Caractères !",
+            'Lname.regex'  =>  "Nom invalide !",
+            'Fname.required'  =>  "Saisissez le prenom !",
+            'Fname.min'  =>  "Prenom invalide !",
+            'Fname.max'  =>  "Prenom invalide Max 35 Caractères!",
+            'Fname.regex'  =>  "Prenom invalide !",
+            'matiere.required'  =>  "Saisissez le nom de la Matière !",
+            'matiere.regex'  =>  "nom de Matière invalide !",
+            'matiere.max'  =>  "nom de Matière est de 30 caractères au Max !",
+            'sex.in'  =>  " Choix invalide !",
+            'filiere.in'  =>  " Choix invalide !",
+            'email.in'  =>  " Choix invalide !",
+            'email.required'  =>  " Choix invalide !",
+            'email.email'  =>  " Choix invalide !",
+        ]);
+
+        $professeur = new professeur();
+        $professeur->Fname = $request->input('Fname');
+        $professeur->Lname = $request->input('Lname');
+        $professeur->Sex = $request->input('sex');
+        $professeur->email = $request->input('email');
+        $professeur->Matiere = $request->input('matiere');
+        $professeur->Filiere = $request->input('filiere');
+        $professeur->AvatarPath = ($request->input('sex') == "M")? "DefTM.png":"DefTF.png";
+        $professeur->save();
+        return redirect(url('/liste-professeur'))->with('status','professeur Bien Créé');
+        
+
+    }
+
+    public function prof_delete(Request $request, $id){
+        $prof =professeur::findOrFail($id);
+        $prof->delete();
+        return redirect('/liste-professeur')->with('status','supprission Faite');
+    }
 
     public function listeProfesseur_edit (Request $request,$id){
 

@@ -105,7 +105,7 @@ class UserController extends Controller
         return redirect(url('/liste-utilisateur'))->with('status','bien supprimé');
     }
 
-    public function user_professeur_insert(Request $request)
+    public function user_insert(Request $request)
     {
 
         $this->validate( $request,
