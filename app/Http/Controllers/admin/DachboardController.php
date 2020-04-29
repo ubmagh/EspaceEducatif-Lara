@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\classe;
 use App\professeur;
 use App\Etudiant;
 use Illuminate\Http\Request;
@@ -266,6 +267,102 @@ class DachboardController extends Controller
 
     }
 
+
+    public function ClassListe(){
+        $classes = classe::all();
+        foreach($classes as $classe){
+            $prof = professeur::find($classe->ProfID);
+            $classe->ProfID = $prof->Lname.' '.$prof->Fname;
+        }
+        $profs = professeur::all();
+        return view('homeAdmin.classesListe')->with(['classes'=>$classes, 'profs'=>$profs]);
+    }
+
+    public function ModifyClassView(Request $request, $id){
+
+        $classe = classe::findOrFail($id);
+        $profs = professeur::all();
+        return view('homeAdmin.Classe_edit')->with(['classe'=>$classe,'profs'=>$profs]);
+
+    }
+
+    public function ModifyClassAction(Request $request, $id){
+
+        $classe = classe::findOrFail($id);
+        $profs = professeur::all();
+        $profs_Ids = [];
+        foreach($profs as $prof){
+            array_push($profs_Ids,$prof->id);
+        }
+        $this->validate($request,
+        [
+            'nom'   =>  'required|max:50',
+            'prof'  =>  Rule::in($profs_Ids),
+            'annee' =>  Rule::in(['1','2']),
+            'filiere' =>  Rule::in(['GI','GE'])
+        ],
+        [   
+            'nom.required'  =>  "Saisissez un nom pour la classe ",
+            'nom.max'   =>  "maximum 50 caractères",
+            'prof.in'   =>  "Choix invalide",
+            'annee.in'  =>  "Choix invalide",
+            'filiere.in'  =>  "Choix invalide",
+        ]);
+
+        $classe->ClasseName = $request->input('nom');
+        $classe->ProfID = $request->input('prof');
+        $classe->Annee = $request->input('annee');
+        $classe->Filiere = $request->input('filiere');
+        $classe->update();
+
+        return redirect('/Classes')->with('status','Modification Faite');
+
+    }
+
+
+    public function ClasseInsert(Request $request){
+
+        $classe = new classe();
+        $profs = professeur::all();
+        $profs_Ids = [];
+        foreach($profs as $prof){
+            array_push($profs_Ids,$prof->id);
+        }
+        $this->validate($request,
+        [
+            'nom'   =>  'required|max:50',
+            'prof'  =>  Rule::in($profs_Ids),
+            'annee' =>  Rule::in(['1','2']),
+            'filiere' =>  Rule::in(['GI','GE'])
+        ],
+        [   
+            'nom.required'  =>  "Saisissez un nom pour la classe ",
+            'nom.max'   =>  "maximum 50 caractères",
+            'prof.in'   =>  "Choix invalide",
+            'annee.in'  =>  "Choix invalide",
+            'filiere.in'  =>  "Choix invalide",
+        ]);
+
+        $classe->ClasseName = $request->input('nom');
+        $classe->ProfID = $request->input('prof');
+        $classe->Annee = $request->input('annee');
+        $classe->Filiere = $request->input('filiere');
+        $classe->save();
+
+        return redirect('/Classes')->with('status','Classe Bien Ajoutée !');
+
+    }
+
+    public function DeleteClasse(Request $request, $id){
+
+        $classe = classe::find($id);
+        if(empty($classe))
+            return redirect(url('Classes'))->with('notfound','x');
+        
+            $classe->delete();
+            return redirect('/Classes')->with('status','Supprission Effectuée !');
+
+    }
 
 
 }

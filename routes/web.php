@@ -74,4 +74,14 @@ Route::group(['middleware' => ['auth','admin']],function(){
      Route::get('/Messages/{id}','ContactController@ViewMessage');
      Route::get('/Messages/del/{id}','ContactController@delete');
 
+
+
+     ///Classes Routes
+     Route::get('/Classes-insert','admin\DachboardController@ClasseInsert')->name('classe-insert');
+     Route::get('/Classes','admin\DachboardController@ClassListe');
+     route::get('/Classes/{id}','admin\DachboardController@ModifyClassView');
+     route::put('/Classes/{id}','admin\DachboardController@ModifyClassAction');
+     route::delete('/Classes-delete/{id}','admin\DachboardController@DeleteClasse');
+
+
 });

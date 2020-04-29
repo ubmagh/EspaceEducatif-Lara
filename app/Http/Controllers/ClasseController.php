@@ -96,4 +96,5 @@ class ClasseController extends Controller
 
     }
 
+
 }
