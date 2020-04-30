@@ -59,7 +59,7 @@
               <p>Maps</p>
             </a>
           </li> --}}
-          <li>
+          <li class="{{ 'Messages' == request()->path() ? 'active' : ''}}">
           <a href="{{ url('/Messages') }}">
               <i class="fas fa-envelope"></i>
               <p>Messages</p>
@@ -83,7 +83,7 @@
               <p>Gérer Les Utilisateurs</p>
             </a>
           </li>
-          <li>
+          <li class="{{ 'Classes' == request()->path() ? 'active' : ''}}">
             <a href="{{ url('/Classes') }}">
               <i class="fas fa-th-list"></i>
               <p>Gérer Les Classes</p>

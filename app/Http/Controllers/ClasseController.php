@@ -76,7 +76,7 @@ class ClasseController extends Controller
 
     public function GetClasse_Figured(string $ClassID){
         $classe = classe::find($ClassID);
-        return ['id'=>$classe->id,'name'=>$classe->ClasseName];
+        return ['id'=>$classe->id,'name'=>$classe->ClasseName,'ids'=>$classe->Filiere.$classe->Annee];
     }
 
 

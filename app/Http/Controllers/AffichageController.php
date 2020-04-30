@@ -13,7 +13,7 @@ class AffichageController extends Controller
 
     public function Getaffiches(string $classID){
         // get all rows 
-        $affichages = affichage::orderBy('date','desc')->get();
+        $affichages = affichage::where('classID',$classID)->orderBy('date','desc')->get();
 
         foreach($affichages as $affiche){
             $files=[];

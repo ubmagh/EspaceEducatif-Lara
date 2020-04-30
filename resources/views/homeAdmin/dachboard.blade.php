@@ -19,7 +19,7 @@
 
 
 
-<div class="content">
+<div class="content mt-3">
   <div class="row">
     <div class="col-lg-4">
       <div class="card card-chart">
