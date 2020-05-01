@@ -11,6 +11,10 @@ use App\professeur;
 use App\Permission;
 use App\post;
 use App\classe;
+use App\PasswordReset;
+use Illuminate\Support\Str;
+use App\Mail\UserPwdReset;
+
 use Exception;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
@@ -1483,5 +1487,136 @@ class UserController extends Controller
         $user->save();
         return $user->CreatedAt."";
     }
+
+
+    public function ForgotPwd_GetEmail(Request $request){
+        $email = $request->email;
+        $validation = Validator::make(['email'=>$request->input('email')],
+        ['email'=>'email|required']);
+
+        if($validation->fails())
+            return response()->json(['status'=>'dataErr'],200);
+        
+        $user = User::where('email',$email)->first();
+        
+        if(empty($user))
+            return response()->json(['status'=>'notfound'],200);
+
+        $token = Str::random(64);
+
+        $passwordreset = PasswordReset::create([
+            'email' =>  $email,
+                'token' =>  $token,
+                'created_at'    => date('Y-d-m H:i:s').""
+        ]);
+
+        $url = config('app.REACT_URL').'/Reset/'.$token."/".urlencode(encrypt($email));
+        Mail::to($email)->send( new UserPwdReset($url) );
+
+        return response()->json(['status'=>'sent'],200);
+    }
+
+
+    public function ForgotPwd_Check(Request $request){
+
+        $validation = Validator::make(
+            [ 
+                'token' =>  $request->input('token'),
+                'encmail'   =>   $request->input('encmail'),
+            ],
+            [
+                'token' =>  "required|min:64",
+                'encmail'   =>  "required",
+            ]
+        );
+
+        if($validation->fails())
+            return response()->json(['status'=>'err'],200);
+            $token =  $request->input('token');
+        $email = decrypt( urldecode( $request->input('encmail') ));
+
+        return "hi";
+        if( count( PasswordReset::where('email',$email)->where('token',$token)->get() )===0 )
+            return response()->json(['status'=>'err'],200);
+
+    }
+
+    public function ForgotPwd_SubmitNewOne(Request $request){
+
+        $validation = Validator::make(
+            [ 
+                'token' =>  $request->input('token'),
+                'encmail'   =>   $request->input('encmail'),
+                'pwd'   =>   $request->input('pwd'),
+            ],
+            [
+                'token' =>  "required|min:64",
+                'encmail'   =>  "required",
+                'pwd'   =>  "required|min:6"
+            ]
+        );
+
+        if($validation->fails())
+            return response()->json(['status'=>'dataErr'],200);
+
+        $token =  $request->input('token');
+        $password =  $request->input('pwd');
+        $email = decrypt( urldecode( $request->input('encmail') ));
+        
+        $user = User::where('email',$email)->first();
+        if(empty($user))
+        return response()->json(['status'=>'notfound'],200);
+
+        if( count( PasswordReset::where('email',$email)->where('token',$token)->get() )===0 )
+        return response()->json(['status'=>'notfound'],200);
+
+
+        $user->password = Hash::make($password);
+        $user->update();
+        
+
+        DB::delete("delete from password_resets where email='$email' ");
+
+        return response()->json(['status'=>'success'],200);
+    }
+
+
+    public function GetFullPost(Request $request){
+
+        try {
+            if (!$user = JWTAuth::parseToken()->authenticate()) {
+                return response()->json(['error' => 'userNotFound'], 200);
+            }
+        } catch (TokenExpiredException $e) {
+            return response()->json(["error" => 'token_expired'], 200);
+        } catch (TokenInvalidException $e) {
+            return response()->json(["error" => 'token_invalid'], 200);
+        } catch (JWTException $e) {
+            return response()->json(["error" => 'token_absent'], 200);
+        }
+
+        if( !ctype_digit($request->only('postID')) ){
+            return response()->json(["status" => 'dataErr'], 200);
+        }
+        $postID = $request->only('postID');
+        $post = Post::find($postID);
+        if( empty($postID) )
+            return response()->json(["status" => 'notFound'], 200);
+        
+
+        if( $user->UserType=="prof" ){
+            $prof = professeur::where('email',$user->email)->first();
+            if( ! app('App\Http\Controllers\ClasseController')->checkProfAccess($prof->id , $post->classId ) )
+            return response()->json(["status" => 'unauthorized'], 200);
+            
+        }else{
+            $etud = Etudiant::where('email',$user->email)->first();
+            if(!app('App\Http\Controllers\ClasseController')->checkEtudiantAccess($etud->Filiere,$etud->Annee,$post->classId))
+                return response()->json(["status" => 'unauthorized'], 200);
+        }
+
+
+    }
+
 
 }

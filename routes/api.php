@@ -123,7 +123,17 @@ Route::prefix('Stats')->group(function () {
 
 
 
+/// pwd forgot routes 
 
+Route::get('forgot', 'UserController@ForgotPwd_GetEmail'); 
+Route::get('forgot_check', 'UserController@ForgotPwd_Check'); 
+Route::post('forgot','UserController@ForgotPwd_SubmitNewOne');
+
+
+
+/// Post viewer routes
+
+Route::get('Post', 'UserController@GetFullPost'); 
 
 
 ///// the next one i don't why it is there !
