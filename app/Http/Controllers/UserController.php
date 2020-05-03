@@ -1595,14 +1595,15 @@ class UserController extends Controller
             return response()->json(["error" => 'token_absent'], 200);
         }
 
-        if( !ctype_digit($request->only('postID')) ){
+        if( !ctype_digit($request->postID) ){
             return response()->json(["status" => 'dataErr'], 200);
         }
-        $postID = $request->only('postID');
+        $postID = $request->postID;
         $post = Post::find($postID);
         if( empty($postID) )
             return response()->json(["status" => 'notFound'], 200);
         
+
 
         if( $user->UserType=="prof" ){
             $prof = professeur::where('email',$user->email)->first();
@@ -1615,6 +1616,7 @@ class UserController extends Controller
                 return response()->json(["status" => 'unauthorized'], 200);
         }
 
+        return app('App\Http\Controllers\PostController')->getFullpost($postID,$user->id);
 
     }
 

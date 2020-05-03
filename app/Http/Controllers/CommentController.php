@@ -31,12 +31,17 @@ class CommentController extends Controller
        $comm= Comment::create([
             'userId'=>$userID,
             'PostId'=>$postID,
-            'date'=>date('Y-d-m H:i:s'),
+            'date'=>date('Y-m-d H:i:s'),
             'Text'=> filter_var($Comment,FILTER_SANITIZE_STRING)
         ]);
 
         return $comm;
         
+    }
+
+    public function AllComments($postID){
+        $comments = Comment::where('PostId',$postID)->get();
+        return $comments; 
     }
 
 
