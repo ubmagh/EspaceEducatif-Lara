@@ -168,7 +168,7 @@ class UserController extends Controller
                 return response()->json(['status' => 'CredErr'], 200, ['Content-Type' => 'application/json']);
             }
         } catch (JWTException $e) {
-            return response()->json(['status' => 'TokErr'], 200, ['Content-Type' => 'application/json']);
+            return response()->json(['status' => 'TokErr', "message"=>$e->getMessage()], 200, ['Content-Type' => 'application/json']);
         }
 
         /*

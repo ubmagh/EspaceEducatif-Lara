@@ -4,6 +4,8 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\Hash;
+
 
 class CreateUsersTable extends Migration
 {
@@ -27,7 +29,7 @@ class CreateUsersTable extends Migration
         DB::table('users')->insert(
             array(
                 'email' => 'etudiant1@localhost.com',
-                'password' => '$2y$10$HVeWX4ufmCL5chB1VQXTeeAg7QfklO3thHrKRw5vn0zPjqhPkHbMa',
+                'password' => Hash::make('password'),
                 'LastLogin'=>null,
                 'CreatedAt'=>'2020/01/02',
                 'UserType'=>'etud',
@@ -40,7 +42,7 @@ class CreateUsersTable extends Migration
         DB::table('users')->insert(
             array(
                 'email' => 'professeur1@localhost.com',
-                'password' => '$2y$10$HVeWX4ufmCL5chB1VQXTeeAg7QfklO3thHrKRw5vn0zPjqhPkHbMa',
+                'password' => Hash::make('password'),
                 'LastLogin'=>null,
                 'CreatedAt'=>'2020/01/02',
                 'UserType'=>'prof',
@@ -51,7 +53,7 @@ class CreateUsersTable extends Migration
         DB::table('users')->insert(
             array(
                 'email' => 'admin@localhost.com',
-                'password' => '$2y$10$HVeWX4ufmCL5chB1VQXTeeAg7QfklO3thHrKRw5vn0zPjqhPkHbMa',
+                'password' => Hash::make('password'),
                 'LastLogin'=>null,
                 'CreatedAt'=>'2020/01/02',
                 'UserType'=>'admin',
